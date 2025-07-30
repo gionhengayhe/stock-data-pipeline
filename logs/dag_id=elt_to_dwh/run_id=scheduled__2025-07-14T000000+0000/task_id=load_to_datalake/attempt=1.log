@@ -1,0 +1,78 @@
+[2025-07-25T11:14:52.579+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T11:14:52.594+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.load_to_datalake scheduled__2025-07-14T00:00:00+00:00 [queued]>
+[2025-07-25T11:14:52.604+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.load_to_datalake scheduled__2025-07-14T00:00:00+00:00 [queued]>
+[2025-07-25T11:14:52.605+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T11:14:52.621+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): load_to_datalake> on 2025-07-14 00:00:00+00:00
+[2025-07-25T11:14:52.631+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'load_to_datalake', 'scheduled__2025-07-14T00:00:00+00:00', '--job-id', '110', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmp97knhii5']
+[2025-07-25T11:14:52.633+0000] {standard_task_runner.py:105} INFO - Job 110: Subtask load_to_datalake
+[2025-07-25T11:14:52.636+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=3361) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T11:14:52.637+0000] {standard_task_runner.py:72} INFO - Started process 3371 to run task
+[2025-07-25T11:14:52.675+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.load_to_datalake scheduled__2025-07-14T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T11:14:52.765+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='load_to_datalake' AIRFLOW_CTX_EXECUTION_DATE='2025-07-14T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-14T00:00:00+00:00'
+[2025-07-25T11:14:52.766+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T11:14:53.135+0000] {logging_mixin.py:190} INFO - Uploading to bucket: stock-project-datalake
+[2025-07-25T11:14:53.724+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250712.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250712.parquet
+[2025-07-25T11:14:53.910+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250713.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250713.parquet
+[2025-07-25T11:14:54.093+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250714.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250714.parquet
+[2025-07-25T11:14:54.300+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250715.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250715.parquet
+[2025-07-25T11:14:54.483+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250716.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250716.parquet
+[2025-07-25T11:14:54.656+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250710.parquet -> s3://stock-project-datalake/news/crawl_news-20250710.parquet
+[2025-07-25T11:14:54.829+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250711.parquet -> s3://stock-project-datalake/news/crawl_news-20250711.parquet
+[2025-07-25T11:14:54.995+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250712.parquet -> s3://stock-project-datalake/news/crawl_news-20250712.parquet
+[2025-07-25T11:14:55.164+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250713.parquet -> s3://stock-project-datalake/news/crawl_news-20250713.parquet
+[2025-07-25T11:14:55.340+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250714.parquet -> s3://stock-project-datalake/news/crawl_news-20250714.parquet
+[2025-07-25T11:14:55.513+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250715.parquet -> s3://stock-project-datalake/news/crawl_news-20250715.parquet
+[2025-07-25T11:14:55.704+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250710.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250710.parquet
+[2025-07-25T11:14:55.893+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250711.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250711.parquet
+[2025-07-25T11:14:56.100+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250714.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250714.parquet
+[2025-07-25T11:14:56.299+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250715.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250715.parquet
+[2025-07-25T11:14:56.300+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T11:14:56.305+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T11:14:56.305+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=load_to_datalake, run_id=scheduled__2025-07-14T00:00:00+00:00, execution_date=20250714T000000, start_date=20250725T111452, end_date=20250725T111456
+[2025-07-25T11:14:56.347+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T11:14:56.363+0000] {taskinstance.py:3901} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T11:14:56.368+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-26T05:02:22.336+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-26T05:02:22.350+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.load_to_datalake scheduled__2025-07-14T00:00:00+00:00 [queued]>
+[2025-07-26T05:02:22.357+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.load_to_datalake scheduled__2025-07-14T00:00:00+00:00 [queued]>
+[2025-07-26T05:02:22.358+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-26T05:02:22.371+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): load_to_datalake> on 2025-07-14 00:00:00+00:00
+[2025-07-26T05:02:22.378+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'load_to_datalake', 'scheduled__2025-07-14T00:00:00+00:00', '--job-id', '64', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmposi8g_9h']
+[2025-07-26T05:02:22.381+0000] {standard_task_runner.py:105} INFO - Job 64: Subtask load_to_datalake
+[2025-07-26T05:02:22.382+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=2349) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-26T05:02:22.382+0000] {standard_task_runner.py:72} INFO - Started process 2359 to run task
+[2025-07-26T05:02:22.413+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.load_to_datalake scheduled__2025-07-14T00:00:00+00:00 [running]> on host 3bc71adbf7e0
+[2025-07-26T05:02:22.477+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='load_to_datalake' AIRFLOW_CTX_EXECUTION_DATE='2025-07-14T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-14T00:00:00+00:00'
+[2025-07-26T05:02:22.478+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-26T05:02:22.588+0000] {logging_mixin.py:190} INFO - Uploading to bucket: stock-project-datalake
+[2025-07-26T05:02:23.228+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250710.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250710.parquet
+[2025-07-26T05:02:23.432+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250711.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250711.parquet
+[2025-07-26T05:02:23.642+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250712.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250712.parquet
+[2025-07-26T05:02:23.845+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250713.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250713.parquet
+[2025-07-26T05:02:24.015+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250714.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250714.parquet
+[2025-07-26T05:02:24.225+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250715.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250715.parquet
+[2025-07-26T05:02:24.396+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250716.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250716.parquet
+[2025-07-26T05:02:24.595+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250717.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250717.parquet
+[2025-07-26T05:02:24.779+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250718.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250718.parquet
+[2025-07-26T05:02:24.973+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250719.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250719.parquet
+[2025-07-26T05:02:25.176+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/companies/crawl_companies-20250720.parquet -> s3://stock-project-datalake/companies/crawl_companies-20250720.parquet
+[2025-07-26T05:02:25.374+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250710.parquet -> s3://stock-project-datalake/news/crawl_news-20250710.parquet
+[2025-07-26T05:02:25.556+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250711.parquet -> s3://stock-project-datalake/news/crawl_news-20250711.parquet
+[2025-07-26T05:02:25.720+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250712.parquet -> s3://stock-project-datalake/news/crawl_news-20250712.parquet
+[2025-07-26T05:02:25.872+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250713.parquet -> s3://stock-project-datalake/news/crawl_news-20250713.parquet
+[2025-07-26T05:02:26.073+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250714.parquet -> s3://stock-project-datalake/news/crawl_news-20250714.parquet
+[2025-07-26T05:02:26.261+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250715.parquet -> s3://stock-project-datalake/news/crawl_news-20250715.parquet
+[2025-07-26T05:02:26.443+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/news/crawl_news-20250716.parquet -> s3://stock-project-datalake/news/crawl_news-20250716.parquet
+[2025-07-26T05:02:26.634+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250710.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250710.parquet
+[2025-07-26T05:02:26.869+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250711.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250711.parquet
+[2025-07-26T05:02:27.130+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250714.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250714.parquet
+[2025-07-26T05:02:27.326+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250715.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250715.parquet
+[2025-07-26T05:02:27.524+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250716.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250716.parquet
+[2025-07-26T05:02:27.727+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250717.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250717.parquet
+[2025-07-26T05:02:27.922+0000] {logging_mixin.py:190} INFO - Uploaded: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250718.parquet -> s3://stock-project-datalake/ohlcs/crawl_ohlcs-20250718.parquet
+[2025-07-26T05:02:27.923+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-26T05:02:27.927+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-26T05:02:27.928+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=load_to_datalake, run_id=scheduled__2025-07-14T00:00:00+00:00, execution_date=20250714T000000, start_date=20250726T050222, end_date=20250726T050227
+[2025-07-26T05:02:27.966+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-26T05:02:27.980+0000] {taskinstance.py:3901} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-07-26T05:02:27.985+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

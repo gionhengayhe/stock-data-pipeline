@@ -1,0 +1,40 @@
+[2025-07-25T11:11:54.779+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T11:11:54.792+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_news_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-25T11:11:54.801+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_news_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-25T11:11:54.801+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T11:11:54.815+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): extract_task.convert_news_to_parquet> on 2025-07-11 00:00:00+00:00
+[2025-07-25T11:11:54.822+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'extract_task.convert_news_to_parquet', 'scheduled__2025-07-11T00:00:00+00:00', '--job-id', '83', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmppreala1y']
+[2025-07-25T11:11:54.824+0000] {standard_task_runner.py:105} INFO - Job 83: Subtask extract_task.convert_news_to_parquet
+[2025-07-25T11:11:54.826+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=2889) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T11:11:54.827+0000] {standard_task_runner.py:72} INFO - Started process 2899 to run task
+[2025-07-25T11:11:54.860+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.extract_task.convert_news_to_parquet scheduled__2025-07-11T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T11:11:54.924+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='extract_task.convert_news_to_parquet' AIRFLOW_CTX_EXECUTION_DATE='2025-07-11T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-11T00:00:00+00:00'
+[2025-07-25T11:11:54.925+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T11:11:54.938+0000] {logging_mixin.py:190} INFO - Looking for file: /opt/airflow/data/raw/news/crawl_news-20250711.json
+[2025-07-25T11:11:55.065+0000] {logging_mixin.py:190} INFO - [news] Saved Parquet file: /opt/airflow/data/parquet/news/crawl_news-20250711.parquet
+[2025-07-25T11:11:55.065+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T11:11:55.071+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T11:11:55.071+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=extract_task.convert_news_to_parquet, run_id=scheduled__2025-07-11T00:00:00+00:00, execution_date=20250711T000000, start_date=20250725T111154, end_date=20250725T111155
+[2025-07-25T11:11:55.122+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T11:11:55.137+0000] {taskinstance.py:3901} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T11:11:55.144+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-26T04:57:28.336+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-26T04:57:28.349+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_news_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-26T04:57:28.358+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_news_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-26T04:57:28.359+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-26T04:57:28.373+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): extract_task.convert_news_to_parquet> on 2025-07-11 00:00:00+00:00
+[2025-07-26T04:57:28.380+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'extract_task.convert_news_to_parquet', 'scheduled__2025-07-11T00:00:00+00:00', '--job-id', '30', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmpffi_eqlf']
+[2025-07-26T04:57:28.381+0000] {standard_task_runner.py:105} INFO - Job 30: Subtask extract_task.convert_news_to_parquet
+[2025-07-26T04:57:28.383+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=741) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-26T04:57:28.384+0000] {standard_task_runner.py:72} INFO - Started process 751 to run task
+[2025-07-26T04:57:28.414+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.extract_task.convert_news_to_parquet scheduled__2025-07-11T00:00:00+00:00 [running]> on host 3bc71adbf7e0
+[2025-07-26T04:57:28.473+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='extract_task.convert_news_to_parquet' AIRFLOW_CTX_EXECUTION_DATE='2025-07-11T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-11T00:00:00+00:00'
+[2025-07-26T04:57:28.473+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-26T04:57:28.487+0000] {logging_mixin.py:190} INFO - Looking for file: /opt/airflow/data/raw/news/crawl_news-20250711.json
+[2025-07-26T04:57:28.618+0000] {logging_mixin.py:190} INFO - [news] Saved Parquet file: /opt/airflow/data/parquet/news/crawl_news-20250711.parquet
+[2025-07-26T04:57:28.619+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-26T04:57:28.625+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-26T04:57:28.625+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=extract_task.convert_news_to_parquet, run_id=scheduled__2025-07-11T00:00:00+00:00, execution_date=20250711T000000, start_date=20250726T045728, end_date=20250726T045728
+[2025-07-26T04:57:28.680+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-26T04:57:28.697+0000] {taskinstance.py:3901} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-07-26T04:57:28.699+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

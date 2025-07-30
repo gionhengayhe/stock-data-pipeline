@@ -1,0 +1,57 @@
+[2025-07-25T09:53:34.780+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T09:53:34.807+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_indexes scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-25T09:53:34.816+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_indexes scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-25T09:53:34.817+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T09:53:34.831+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): ddl_task.create_indexes> on 2025-05-01 00:00:00+00:00
+[2025-07-25T09:53:34.841+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'etl_to_db', 'ddl_task.create_indexes', 'scheduled__2025-05-01T00:00:00+00:00', '--job-id', '43', '--raw', '--subdir', 'DAGS_FOLDER/etl_to_db.py', '--cfg-path', '/tmp/tmpyon1ux3q']
+[2025-07-25T09:53:34.843+0000] {standard_task_runner.py:105} INFO - Job 43: Subtask ddl_task.create_indexes
+[2025-07-25T09:53:34.847+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=1741) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T09:53:34.848+0000] {standard_task_runner.py:72} INFO - Started process 1751 to run task
+[2025-07-25T09:53:34.887+0000] {task_command.py:467} INFO - Running <TaskInstance: etl_to_db.ddl_task.create_indexes scheduled__2025-05-01T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T09:53:34.971+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='etl_to_db' AIRFLOW_CTX_TASK_ID='ddl_task.create_indexes' AIRFLOW_CTX_EXECUTION_DATE='2025-05-01T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-01T00:00:00+00:00'
+[2025-07-25T09:53:34.972+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T09:53:35.013+0000] {logging_mixin.py:190} INFO - Indexes already exist.
+[2025-07-25T09:53:35.013+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T09:53:35.020+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T09:53:35.021+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=etl_to_db, task_id=ddl_task.create_indexes, run_id=scheduled__2025-05-01T00:00:00+00:00, execution_date=20250501T000000, start_date=20250725T095334, end_date=20250725T095335
+[2025-07-25T09:53:35.064+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T09:53:35.088+0000] {taskinstance.py:3901} INFO - 2 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T09:53:35.093+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-25T10:20:42.760+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T10:20:42.774+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_indexes scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-25T10:20:42.782+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_indexes scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-25T10:20:42.782+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T10:20:42.796+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): ddl_task.create_indexes> on 2025-05-01 00:00:00+00:00
+[2025-07-25T10:20:42.804+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'etl_to_db', 'ddl_task.create_indexes', 'scheduled__2025-05-01T00:00:00+00:00', '--job-id', '58', '--raw', '--subdir', 'DAGS_FOLDER/etl_to_db.py', '--cfg-path', '/tmp/tmpdp1fmd86']
+[2025-07-25T10:20:42.806+0000] {standard_task_runner.py:105} INFO - Job 58: Subtask ddl_task.create_indexes
+[2025-07-25T10:20:42.807+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=2144) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T10:20:42.807+0000] {standard_task_runner.py:72} INFO - Started process 2154 to run task
+[2025-07-25T10:20:42.849+0000] {task_command.py:467} INFO - Running <TaskInstance: etl_to_db.ddl_task.create_indexes scheduled__2025-05-01T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T10:20:42.909+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='etl_to_db' AIRFLOW_CTX_TASK_ID='ddl_task.create_indexes' AIRFLOW_CTX_EXECUTION_DATE='2025-05-01T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-01T00:00:00+00:00'
+[2025-07-25T10:20:42.909+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T10:20:42.934+0000] {logging_mixin.py:190} INFO - Indexes already exist.
+[2025-07-25T10:20:42.934+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T10:20:42.939+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T10:20:42.939+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=etl_to_db, task_id=ddl_task.create_indexes, run_id=scheduled__2025-05-01T00:00:00+00:00, execution_date=20250501T000000, start_date=20250725T102042, end_date=20250725T102042
+[2025-07-25T10:20:42.984+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T10:20:43.007+0000] {taskinstance.py:3901} INFO - 2 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T10:20:43.013+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-26T04:44:22.071+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-26T04:44:22.082+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_indexes scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-26T04:44:22.088+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_indexes scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-26T04:44:22.088+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-26T04:44:22.101+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): ddl_task.create_indexes> on 2025-05-01 00:00:00+00:00
+[2025-07-26T04:44:22.106+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'etl_to_db', 'ddl_task.create_indexes', 'scheduled__2025-05-01T00:00:00+00:00', '--job-id', '6', '--raw', '--subdir', 'DAGS_FOLDER/etl_to_db.py', '--cfg-path', '/tmp/tmp6r8wzaat']
+[2025-07-26T04:44:22.107+0000] {standard_task_runner.py:105} INFO - Job 6: Subtask ddl_task.create_indexes
+[2025-07-26T04:44:22.109+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=283) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-26T04:44:22.110+0000] {standard_task_runner.py:72} INFO - Started process 293 to run task
+[2025-07-26T04:44:22.137+0000] {task_command.py:467} INFO - Running <TaskInstance: etl_to_db.ddl_task.create_indexes scheduled__2025-05-01T00:00:00+00:00 [running]> on host 3bc71adbf7e0
+[2025-07-26T04:44:22.189+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='etl_to_db' AIRFLOW_CTX_TASK_ID='ddl_task.create_indexes' AIRFLOW_CTX_EXECUTION_DATE='2025-05-01T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-01T00:00:00+00:00'
+[2025-07-26T04:44:22.189+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-26T04:44:22.212+0000] {logging_mixin.py:190} INFO - Indexes already exist.
+[2025-07-26T04:44:22.213+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-26T04:44:22.217+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-26T04:44:22.217+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=etl_to_db, task_id=ddl_task.create_indexes, run_id=scheduled__2025-05-01T00:00:00+00:00, execution_date=20250501T000000, start_date=20250726T044422, end_date=20250726T044422
+[2025-07-26T04:44:22.244+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-26T04:44:22.259+0000] {taskinstance.py:3901} INFO - 2 downstream tasks scheduled from follow-on schedule check
+[2025-07-26T04:44:22.264+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

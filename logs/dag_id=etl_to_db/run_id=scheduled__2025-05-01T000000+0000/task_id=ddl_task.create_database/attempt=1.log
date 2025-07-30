@@ -1,0 +1,57 @@
+[2025-07-25T09:53:13.199+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T09:53:13.215+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_database scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-25T09:53:13.225+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_database scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-25T09:53:13.226+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T09:53:13.247+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): ddl_task.create_database> on 2025-05-01 00:00:00+00:00
+[2025-07-25T09:53:13.257+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'etl_to_db', 'ddl_task.create_database', 'scheduled__2025-05-01T00:00:00+00:00', '--job-id', '39', '--raw', '--subdir', 'DAGS_FOLDER/etl_to_db.py', '--cfg-path', '/tmp/tmpnyf911tk']
+[2025-07-25T09:53:13.262+0000] {standard_task_runner.py:105} INFO - Job 39: Subtask ddl_task.create_database
+[2025-07-25T09:53:13.268+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=1691) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T09:53:13.269+0000] {standard_task_runner.py:72} INFO - Started process 1701 to run task
+[2025-07-25T09:53:13.326+0000] {task_command.py:467} INFO - Running <TaskInstance: etl_to_db.ddl_task.create_database scheduled__2025-05-01T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T09:53:13.458+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='etl_to_db' AIRFLOW_CTX_TASK_ID='ddl_task.create_database' AIRFLOW_CTX_EXECUTION_DATE='2025-05-01T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-01T00:00:00+00:00'
+[2025-07-25T09:53:13.462+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T09:53:13.532+0000] {logging_mixin.py:190} INFO - Database datasource already exists
+[2025-07-25T09:53:13.533+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T09:53:13.545+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T09:53:13.545+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=etl_to_db, task_id=ddl_task.create_database, run_id=scheduled__2025-05-01T00:00:00+00:00, execution_date=20250501T000000, start_date=20250725T095313, end_date=20250725T095313
+[2025-07-25T09:53:13.607+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T09:53:13.635+0000] {taskinstance.py:3901} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T09:53:13.641+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-25T10:20:19.836+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T10:20:19.846+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_database scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-25T10:20:19.851+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_database scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-25T10:20:19.852+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T10:20:19.866+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): ddl_task.create_database> on 2025-05-01 00:00:00+00:00
+[2025-07-25T10:20:19.893+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'etl_to_db', 'ddl_task.create_database', 'scheduled__2025-05-01T00:00:00+00:00', '--job-id', '54', '--raw', '--subdir', 'DAGS_FOLDER/etl_to_db.py', '--cfg-path', '/tmp/tmpoi9rx8t9']
+[2025-07-25T10:20:19.903+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=2094) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T10:20:19.905+0000] {standard_task_runner.py:105} INFO - Job 54: Subtask ddl_task.create_database
+[2025-07-25T10:20:19.906+0000] {standard_task_runner.py:72} INFO - Started process 2104 to run task
+[2025-07-25T10:20:20.027+0000] {task_command.py:467} INFO - Running <TaskInstance: etl_to_db.ddl_task.create_database scheduled__2025-05-01T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T10:20:20.161+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='etl_to_db' AIRFLOW_CTX_TASK_ID='ddl_task.create_database' AIRFLOW_CTX_EXECUTION_DATE='2025-05-01T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-01T00:00:00+00:00'
+[2025-07-25T10:20:20.163+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T10:20:20.212+0000] {logging_mixin.py:190} INFO - Database datasource already exists
+[2025-07-25T10:20:20.213+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T10:20:20.223+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T10:20:20.224+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=etl_to_db, task_id=ddl_task.create_database, run_id=scheduled__2025-05-01T00:00:00+00:00, execution_date=20250501T000000, start_date=20250725T102019, end_date=20250725T102020
+[2025-07-25T10:20:20.287+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T10:20:20.308+0000] {taskinstance.py:3901} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T10:20:20.313+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-26T04:44:06.033+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-26T04:44:06.042+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_database scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-26T04:44:06.047+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: etl_to_db.ddl_task.create_database scheduled__2025-05-01T00:00:00+00:00 [queued]>
+[2025-07-26T04:44:06.047+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-26T04:44:06.059+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): ddl_task.create_database> on 2025-05-01 00:00:00+00:00
+[2025-07-26T04:44:06.064+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'etl_to_db', 'ddl_task.create_database', 'scheduled__2025-05-01T00:00:00+00:00', '--job-id', '2', '--raw', '--subdir', 'DAGS_FOLDER/etl_to_db.py', '--cfg-path', '/tmp/tmps3h6wedx']
+[2025-07-26T04:44:06.066+0000] {standard_task_runner.py:105} INFO - Job 2: Subtask ddl_task.create_database
+[2025-07-26T04:44:06.067+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=231) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-26T04:44:06.068+0000] {standard_task_runner.py:72} INFO - Started process 241 to run task
+[2025-07-26T04:44:06.102+0000] {task_command.py:467} INFO - Running <TaskInstance: etl_to_db.ddl_task.create_database scheduled__2025-05-01T00:00:00+00:00 [running]> on host 3bc71adbf7e0
+[2025-07-26T04:44:06.155+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='etl_to_db' AIRFLOW_CTX_TASK_ID='ddl_task.create_database' AIRFLOW_CTX_EXECUTION_DATE='2025-05-01T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-01T00:00:00+00:00'
+[2025-07-26T04:44:06.156+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-26T04:44:06.212+0000] {logging_mixin.py:190} INFO - Database datasource already exists
+[2025-07-26T04:44:06.212+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-26T04:44:06.216+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-26T04:44:06.216+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=etl_to_db, task_id=ddl_task.create_database, run_id=scheduled__2025-05-01T00:00:00+00:00, execution_date=20250501T000000, start_date=20250726T044406, end_date=20250726T044406
+[2025-07-26T04:44:06.242+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-26T04:44:06.259+0000] {taskinstance.py:3901} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-07-26T04:44:06.264+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

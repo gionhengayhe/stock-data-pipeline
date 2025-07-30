@@ -1,0 +1,60 @@
+[2025-07-25T11:12:38.735+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T11:12:38.749+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.load_db_to_parquet scheduled__2025-07-13T00:00:00+00:00 [queued]>
+[2025-07-25T11:12:38.758+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.load_db_to_parquet scheduled__2025-07-13T00:00:00+00:00 [queued]>
+[2025-07-25T11:12:38.759+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T11:12:38.773+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): extract_task.load_db_to_parquet> on 2025-07-13 00:00:00+00:00
+[2025-07-25T11:12:38.780+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'extract_task.load_db_to_parquet', 'scheduled__2025-07-13T00:00:00+00:00', '--job-id', '90', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmpor50l23a']
+[2025-07-25T11:12:38.782+0000] {standard_task_runner.py:105} INFO - Job 90: Subtask extract_task.load_db_to_parquet
+[2025-07-25T11:12:38.784+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=3009) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T11:12:38.785+0000] {standard_task_runner.py:72} INFO - Started process 3019 to run task
+[2025-07-25T11:12:38.818+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.extract_task.load_db_to_parquet scheduled__2025-07-13T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T11:12:38.881+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='extract_task.load_db_to_parquet' AIRFLOW_CTX_EXECUTION_DATE='2025-07-13T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-13T00:00:00+00:00'
+[2025-07-25T11:12:38.882+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T11:12:39.801+0000] {logging_mixin.py:190} INFO - [Company extract] retrieved 23670 rows from the database
+[2025-07-25T11:12:39.833+0000] {logging_mixin.py:190} INFO - Saved data from database to parquet successfully at /opt/airflow/data/parquet/companies/crawl_companies-20250713.parquet
+[2025-07-25T11:12:39.834+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T11:12:39.841+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T11:12:39.841+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=extract_task.load_db_to_parquet, run_id=scheduled__2025-07-13T00:00:00+00:00, execution_date=20250713T000000, start_date=20250725T111238, end_date=20250725T111239
+[2025-07-25T11:12:39.883+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T11:12:39.899+0000] {taskinstance.py:3901} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T11:12:39.900+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-25T11:51:59.199+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T11:51:59.216+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.load_db_to_parquet scheduled__2025-07-13T00:00:00+00:00 [queued]>
+[2025-07-25T11:51:59.229+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.load_db_to_parquet scheduled__2025-07-13T00:00:00+00:00 [queued]>
+[2025-07-25T11:51:59.229+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T11:51:59.249+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): extract_task.load_db_to_parquet> on 2025-07-13 00:00:00+00:00
+[2025-07-25T11:51:59.257+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'extract_task.load_db_to_parquet', 'scheduled__2025-07-13T00:00:00+00:00', '--job-id', '159', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmpquu0howm']
+[2025-07-25T11:51:59.260+0000] {standard_task_runner.py:105} INFO - Job 159: Subtask extract_task.load_db_to_parquet
+[2025-07-25T11:51:59.263+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=4733) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T11:51:59.265+0000] {standard_task_runner.py:72} INFO - Started process 4743 to run task
+[2025-07-25T11:51:59.331+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.extract_task.load_db_to_parquet scheduled__2025-07-13T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T11:51:59.437+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='extract_task.load_db_to_parquet' AIRFLOW_CTX_EXECUTION_DATE='2025-07-13T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-13T00:00:00+00:00'
+[2025-07-25T11:51:59.438+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T11:52:00.732+0000] {logging_mixin.py:190} INFO - [Company extract] retrieved 23670 rows from the database
+[2025-07-25T11:52:00.786+0000] {logging_mixin.py:190} INFO - Saved data from database to parquet successfully at /opt/airflow/data/parquet/companies/crawl_companies-20250713.parquet
+[2025-07-25T11:52:00.787+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T11:52:00.795+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T11:52:00.797+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=extract_task.load_db_to_parquet, run_id=scheduled__2025-07-13T00:00:00+00:00, execution_date=20250713T000000, start_date=20250725T115159, end_date=20250725T115200
+[2025-07-25T11:52:00.850+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T11:52:00.874+0000] {taskinstance.py:3901} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T11:52:00.883+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-26T04:58:19.273+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-26T04:58:19.293+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.load_db_to_parquet scheduled__2025-07-13T00:00:00+00:00 [queued]>
+[2025-07-26T04:58:19.301+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.load_db_to_parquet scheduled__2025-07-13T00:00:00+00:00 [queued]>
+[2025-07-26T04:58:19.301+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-26T04:58:19.326+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): extract_task.load_db_to_parquet> on 2025-07-13 00:00:00+00:00
+[2025-07-26T04:58:19.332+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'extract_task.load_db_to_parquet', 'scheduled__2025-07-13T00:00:00+00:00', '--job-id', '39', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmp4y1_k65k']
+[2025-07-26T04:58:19.334+0000] {standard_task_runner.py:105} INFO - Job 39: Subtask extract_task.load_db_to_parquet
+[2025-07-26T04:58:19.336+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=942) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-26T04:58:19.337+0000] {standard_task_runner.py:72} INFO - Started process 952 to run task
+[2025-07-26T04:58:19.386+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.extract_task.load_db_to_parquet scheduled__2025-07-13T00:00:00+00:00 [running]> on host 3bc71adbf7e0
+[2025-07-26T04:58:19.457+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='extract_task.load_db_to_parquet' AIRFLOW_CTX_EXECUTION_DATE='2025-07-13T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-13T00:00:00+00:00'
+[2025-07-26T04:58:19.458+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-26T04:58:20.240+0000] {logging_mixin.py:190} INFO - [Company extract] retrieved 23670 rows from the database
+[2025-07-26T04:58:20.275+0000] {logging_mixin.py:190} INFO - Saved data from database to parquet successfully at /opt/airflow/data/parquet/companies/crawl_companies-20250713.parquet
+[2025-07-26T04:58:20.276+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-26T04:58:20.280+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-26T04:58:20.281+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=extract_task.load_db_to_parquet, run_id=scheduled__2025-07-13T00:00:00+00:00, execution_date=20250713T000000, start_date=20250726T045819, end_date=20250726T045820
+[2025-07-26T04:58:20.354+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-26T04:58:20.367+0000] {taskinstance.py:3901} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-07-26T04:58:20.368+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

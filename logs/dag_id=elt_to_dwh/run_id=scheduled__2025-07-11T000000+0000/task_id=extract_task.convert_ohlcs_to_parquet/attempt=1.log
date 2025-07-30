@@ -1,0 +1,60 @@
+[2025-07-25T11:12:00.680+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T11:12:00.717+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_ohlcs_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-25T11:12:00.744+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_ohlcs_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-25T11:12:00.748+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T11:12:00.773+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): extract_task.convert_ohlcs_to_parquet> on 2025-07-11 00:00:00+00:00
+[2025-07-25T11:12:00.783+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'extract_task.convert_ohlcs_to_parquet', 'scheduled__2025-07-11T00:00:00+00:00', '--job-id', '84', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmphbosl6_b']
+[2025-07-25T11:12:00.785+0000] {standard_task_runner.py:105} INFO - Job 84: Subtask extract_task.convert_ohlcs_to_parquet
+[2025-07-25T11:12:00.795+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=2910) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T11:12:00.797+0000] {standard_task_runner.py:72} INFO - Started process 2920 to run task
+[2025-07-25T11:12:00.855+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.extract_task.convert_ohlcs_to_parquet scheduled__2025-07-11T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T11:12:00.973+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='extract_task.convert_ohlcs_to_parquet' AIRFLOW_CTX_EXECUTION_DATE='2025-07-11T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-11T00:00:00+00:00'
+[2025-07-25T11:12:00.975+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T11:12:01.010+0000] {logging_mixin.py:190} INFO - Looking for file: /opt/airflow/data/raw/ohlcs/crawl_ohlcs-20250711.json
+[2025-07-25T11:12:01.431+0000] {logging_mixin.py:190} INFO - [ohlcs] Saved Parquet file: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250711.parquet
+[2025-07-25T11:12:01.432+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T11:12:01.441+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T11:12:01.442+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=extract_task.convert_ohlcs_to_parquet, run_id=scheduled__2025-07-11T00:00:00+00:00, execution_date=20250711T000000, start_date=20250725T111200, end_date=20250725T111201
+[2025-07-25T11:12:01.535+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T11:12:01.563+0000] {taskinstance.py:3901} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T11:12:01.574+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-25T11:51:22.790+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T11:51:22.804+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_ohlcs_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-25T11:51:22.846+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_ohlcs_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-25T11:51:22.849+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T11:51:22.912+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): extract_task.convert_ohlcs_to_parquet> on 2025-07-11 00:00:00+00:00
+[2025-07-25T11:51:22.960+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'extract_task.convert_ohlcs_to_parquet', 'scheduled__2025-07-11T00:00:00+00:00', '--job-id', '153', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmp7vrxh9a6']
+[2025-07-25T11:51:22.963+0000] {standard_task_runner.py:105} INFO - Job 153: Subtask extract_task.convert_ohlcs_to_parquet
+[2025-07-25T11:51:22.966+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=4635) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T11:51:22.967+0000] {standard_task_runner.py:72} INFO - Started process 4645 to run task
+[2025-07-25T11:51:23.032+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.extract_task.convert_ohlcs_to_parquet scheduled__2025-07-11T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T11:51:23.128+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='extract_task.convert_ohlcs_to_parquet' AIRFLOW_CTX_EXECUTION_DATE='2025-07-11T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-11T00:00:00+00:00'
+[2025-07-25T11:51:23.129+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T11:51:23.146+0000] {logging_mixin.py:190} INFO - Looking for file: /opt/airflow/data/raw/ohlcs/crawl_ohlcs-20250711.json
+[2025-07-25T11:51:23.313+0000] {logging_mixin.py:190} INFO - [ohlcs] Saved Parquet file: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250711.parquet
+[2025-07-25T11:51:23.313+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T11:51:23.318+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T11:51:23.319+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=extract_task.convert_ohlcs_to_parquet, run_id=scheduled__2025-07-11T00:00:00+00:00, execution_date=20250711T000000, start_date=20250725T115122, end_date=20250725T115123
+[2025-07-25T11:51:23.384+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T11:51:23.397+0000] {taskinstance.py:3901} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T11:51:23.404+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-26T04:57:32.973+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-26T04:57:32.984+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_ohlcs_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-26T04:57:32.992+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.extract_task.convert_ohlcs_to_parquet scheduled__2025-07-11T00:00:00+00:00 [queued]>
+[2025-07-26T04:57:32.992+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-26T04:57:33.005+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): extract_task.convert_ohlcs_to_parquet> on 2025-07-11 00:00:00+00:00
+[2025-07-26T04:57:33.011+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'extract_task.convert_ohlcs_to_parquet', 'scheduled__2025-07-11T00:00:00+00:00', '--job-id', '31', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmpain0cc28']
+[2025-07-26T04:57:33.013+0000] {standard_task_runner.py:105} INFO - Job 31: Subtask extract_task.convert_ohlcs_to_parquet
+[2025-07-26T04:57:33.014+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=762) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-26T04:57:33.014+0000] {standard_task_runner.py:72} INFO - Started process 772 to run task
+[2025-07-26T04:57:33.045+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.extract_task.convert_ohlcs_to_parquet scheduled__2025-07-11T00:00:00+00:00 [running]> on host 3bc71adbf7e0
+[2025-07-26T04:57:33.106+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='extract_task.convert_ohlcs_to_parquet' AIRFLOW_CTX_EXECUTION_DATE='2025-07-11T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-11T00:00:00+00:00'
+[2025-07-26T04:57:33.107+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-26T04:57:33.118+0000] {logging_mixin.py:190} INFO - Looking for file: /opt/airflow/data/raw/ohlcs/crawl_ohlcs-20250711.json
+[2025-07-26T04:57:33.267+0000] {logging_mixin.py:190} INFO - [ohlcs] Saved Parquet file: /opt/airflow/data/parquet/ohlcs/crawl_ohlcs-20250711.parquet
+[2025-07-26T04:57:33.268+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-26T04:57:33.272+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-26T04:57:33.272+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=extract_task.convert_ohlcs_to_parquet, run_id=scheduled__2025-07-11T00:00:00+00:00, execution_date=20250711T000000, start_date=20250726T045732, end_date=20250726T045733
+[2025-07-26T04:57:33.309+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-26T04:57:33.326+0000] {taskinstance.py:3901} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-07-26T04:57:33.332+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

@@ -1,0 +1,57 @@
+[2025-07-25T11:15:01.479+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T11:15:01.489+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.create_dwh scheduled__2025-07-18T00:00:00+00:00 [queued]>
+[2025-07-25T11:15:01.496+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.create_dwh scheduled__2025-07-18T00:00:00+00:00 [queued]>
+[2025-07-25T11:15:01.496+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T11:15:01.511+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): create_dwh> on 2025-07-18 00:00:00+00:00
+[2025-07-25T11:15:01.519+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'create_dwh', 'scheduled__2025-07-18T00:00:00+00:00', '--job-id', '111', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmpkx4ihi79']
+[2025-07-25T11:15:01.521+0000] {standard_task_runner.py:105} INFO - Job 111: Subtask create_dwh
+[2025-07-25T11:15:01.523+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=3405) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T11:15:01.525+0000] {standard_task_runner.py:72} INFO - Started process 3415 to run task
+[2025-07-25T11:15:01.561+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.create_dwh scheduled__2025-07-18T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T11:15:01.638+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='create_dwh' AIRFLOW_CTX_EXECUTION_DATE='2025-07-18T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-18T00:00:00+00:00'
+[2025-07-25T11:15:01.639+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T11:15:01.700+0000] {logging_mixin.py:190} INFO - Executed DDL script successfully!
+[2025-07-25T11:15:01.716+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T11:15:01.723+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T11:15:01.724+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=create_dwh, run_id=scheduled__2025-07-18T00:00:00+00:00, execution_date=20250718T000000, start_date=20250725T111501, end_date=20250725T111501
+[2025-07-25T11:15:01.780+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T11:15:01.803+0000] {taskinstance.py:3901} INFO - 3 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T11:15:01.808+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-25T11:54:46.576+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-25T11:54:46.593+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.create_dwh scheduled__2025-07-18T00:00:00+00:00 [queued]>
+[2025-07-25T11:54:46.607+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.create_dwh scheduled__2025-07-18T00:00:00+00:00 [queued]>
+[2025-07-25T11:54:46.608+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-25T11:54:46.632+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): create_dwh> on 2025-07-18 00:00:00+00:00
+[2025-07-25T11:54:46.641+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'create_dwh', 'scheduled__2025-07-18T00:00:00+00:00', '--job-id', '179', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmpvseex6v5']
+[2025-07-25T11:54:46.649+0000] {standard_task_runner.py:105} INFO - Job 179: Subtask create_dwh
+[2025-07-25T11:54:46.650+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=5075) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-25T11:54:46.651+0000] {standard_task_runner.py:72} INFO - Started process 5085 to run task
+[2025-07-25T11:54:46.694+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.create_dwh scheduled__2025-07-18T00:00:00+00:00 [running]> on host 74cfddf97016
+[2025-07-25T11:54:46.758+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='create_dwh' AIRFLOW_CTX_EXECUTION_DATE='2025-07-18T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-18T00:00:00+00:00'
+[2025-07-25T11:54:46.759+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-25T11:54:46.816+0000] {logging_mixin.py:190} INFO - Executed DDL script successfully!
+[2025-07-25T11:54:46.830+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-25T11:54:46.835+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-25T11:54:46.836+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=create_dwh, run_id=scheduled__2025-07-18T00:00:00+00:00, execution_date=20250718T000000, start_date=20250725T115446, end_date=20250725T115446
+[2025-07-25T11:54:46.866+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-25T11:54:46.886+0000] {taskinstance.py:3901} INFO - 3 downstream tasks scheduled from follow-on schedule check
+[2025-07-25T11:54:46.892+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
+[2025-07-26T05:08:40.877+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-07-26T05:08:40.886+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: elt_to_dwh.create_dwh scheduled__2025-07-18T00:00:00+00:00 [queued]>
+[2025-07-26T05:08:40.892+0000] {taskinstance.py:2614} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: elt_to_dwh.create_dwh scheduled__2025-07-18T00:00:00+00:00 [queued]>
+[2025-07-26T05:08:40.893+0000] {taskinstance.py:2867} INFO - Starting attempt 1 of 1
+[2025-07-26T05:08:40.905+0000] {taskinstance.py:2890} INFO - Executing <Task(PythonOperator): create_dwh> on 2025-07-18 00:00:00+00:00
+[2025-07-26T05:08:40.912+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'elt_to_dwh', 'create_dwh', 'scheduled__2025-07-18T00:00:00+00:00', '--job-id', '88', '--raw', '--subdir', 'DAGS_FOLDER/elt_to_dwh.py', '--cfg-path', '/tmp/tmpl4m431wo']
+[2025-07-26T05:08:40.914+0000] {standard_task_runner.py:105} INFO - Job 88: Subtask create_dwh
+[2025-07-26T05:08:40.915+0000] {logging_mixin.py:190} WARNING - /home/airflow/.local/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:70 DeprecationWarning: This process (pid=5711) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-07-26T05:08:40.916+0000] {standard_task_runner.py:72} INFO - Started process 5721 to run task
+[2025-07-26T05:08:40.944+0000] {task_command.py:467} INFO - Running <TaskInstance: elt_to_dwh.create_dwh scheduled__2025-07-18T00:00:00+00:00 [running]> on host 3bc71adbf7e0
+[2025-07-26T05:08:41.006+0000] {taskinstance.py:3134} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='elt_to_dwh' AIRFLOW_CTX_TASK_ID='create_dwh' AIRFLOW_CTX_EXECUTION_DATE='2025-07-18T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-07-18T00:00:00+00:00'
+[2025-07-26T05:08:41.007+0000] {taskinstance.py:732} INFO - ::endgroup::
+[2025-07-26T05:08:41.057+0000] {logging_mixin.py:190} INFO - Executed DDL script successfully!
+[2025-07-26T05:08:41.075+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-07-26T05:08:41.079+0000] {taskinstance.py:341} INFO - ::group::Post task execution logs
+[2025-07-26T05:08:41.079+0000] {taskinstance.py:353} INFO - Marking task as SUCCESS. dag_id=elt_to_dwh, task_id=create_dwh, run_id=scheduled__2025-07-18T00:00:00+00:00, execution_date=20250718T000000, start_date=20250726T050840, end_date=20250726T050841
+[2025-07-26T05:08:41.131+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-07-26T05:08:41.160+0000] {taskinstance.py:3901} INFO - 3 downstream tasks scheduled from follow-on schedule check
+[2025-07-26T05:08:41.166+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
