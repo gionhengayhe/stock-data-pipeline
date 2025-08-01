@@ -32,11 +32,11 @@ This project addresses the problem by:
 
 ## 📡 Data Sources
 
-| Source API                                   | Description                                   |
-| -------------------------------------------- | --------------------------------------------- |
-| [sec-api.io](https://sec-api.io)             | News from 10-K/8-K filings and press releases |
-| [Alpha Vantage](https://www.alphavantage.co) | Market news sentiment analysis                |
-| [Polygon.io](https://polygon.io)             | Daily OHLCV per company                       |
+| Source API                                   | Description                                                                                                                     |
+| -------------------------------------------- |---------------------------------------------------------------------------------------------------------------------------------|
+| [sec-api.io](https://sec-api.io)             | Provides the list of companies currently listed on major U.S. stock exchanges (NYSE, NASDAQ).                                   |
+| [Alpha Vantage](https://www.alphavantage.co) | Offers two APIs: one for global market status, and another for financial news with sentiment scores from top-tier news sources. |
+| [Polygon.io](https://polygon.io)             | Daily OHLCV per company                                                                                                         |
 
 ---
 
