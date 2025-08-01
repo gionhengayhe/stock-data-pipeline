@@ -2,7 +2,7 @@
 
 ## 🔍 Overview
 
-### A production-grade batch ETL pipeline for financial data, integrating APIs, automated processing, and dashboarding—all containerized for portability and scalability.
+A production-grade batch ETL pipeline for financial data, integrating APIs, automated processing, and dashboarding—all containerized for portability and scalability.
 
 ## 🎯 Problem Statement
 
@@ -81,9 +81,10 @@ The warehouse uses a **Galaxy Schema**, with multiple fact tables sharing confor
 git clone https://github.com/gionhengayhe/stock-data-pipeline.git
 cd stock-data-pipeline
 docker-compose up --build
-Access Airflow UI at: http://localhost:8080
 ```
+Access Airflow UI at: http://localhost:8080
 
+Access Flask API at: http://localhost:5000
 ## 📎 Deliverables
 
 - 📘 Project Documentation: [View Detailed Documentation](https://drive.google.com/file/d/12CdgVoBiFTVqCraiy8LkM63DVi-YIiqu/view?usp=drive_link)
