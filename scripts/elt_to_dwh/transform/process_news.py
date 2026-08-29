@@ -1,214 +1,203 @@
-import os
-import sys
-from datetime import datetime
-
-import boto3
 import duckdb
-import polars as pl
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, explode, lit, to_timestamp
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import broadcast, col, explode, lit, to_timestamp
+from pyspark.sql.types import DoubleType
 
 from scripts.common.config import duckdb_path
+from scripts.common.spark import (
+    create_spark_session,
+    execution_date_argument,
+    s3a_parquet_uri,
+)
+from scripts.common.warehouse import ensure_time, register_spark_frame, transaction
 
 
-def get_spark_session():
+def transform_topics(news: DataFrame) -> DataFrame:
     return (
-        SparkSession.builder.appName("process_news")
-        .master("spark://spark-master:7077")
-        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
-        .config("spark.hadoop.fs.s3a.access.key", os.getenv("AWS_ACCESS_KEY_ID"))
-        .config("spark.hadoop.fs.s3a.secret.key", os.getenv("AWS_SECRET_ACCESS_KEY"))
-        .getOrCreate()
+        news.select(explode(col("topics")).alias("topic_data"))
+        .select(col("topic_data.topic").alias("name"))
+        .where(col("name").isNotNull())
+        .distinct()
     )
 
 
-def get_parquet_path_by_date(bucket: str, prefix: str, execution_date: str) -> str:
-    target_key = f"{prefix}/crawl_{prefix}-{execution_date}.parquet"
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-        region_name=os.getenv("AWS_REGION"),
+def transform_news(news: DataFrame, time_id: int) -> DataFrame:
+    return (
+        news.withColumn(
+            "time_published",
+            to_timestamp(col("time_published"), "yyyyMMdd'T'HHmmss"),
+        )
+        .withColumn("time_id", lit(time_id))
+        .select(
+            "title",
+            "url",
+            "time_published",
+            "authors",
+            "summary",
+            "source",
+            "overall_sentiment_score",
+            "overall_sentiment_label",
+            "time_id",
+        )
+        .dropDuplicates(["url"])
     )
-    response = s3.list_objects_v2(Bucket=bucket, Prefix=target_key)
-    files = [obj["Key"] for obj in response.get("Contents", []) if obj["Key"] == target_key]
-    if not files:
-        raise FileNotFoundError(f"No Parquet file found for {execution_date} at prefix {prefix}")
-    return f"s3a://{bucket}/{files[0]}"
 
 
-def _latest_company_ids(conn: duckdb.DuckDBPyConnection) -> pl.DataFrame:
-    return pl.from_pandas(
-        conn.execute(
-            """
-            SELECT id, ticker
-            FROM (
-                SELECT id, ticker, updated_time,
-                       ROW_NUMBER() OVER (
-                           PARTITION BY ticker ORDER BY updated_time DESC, id DESC
-                       ) AS row_num
-                FROM dim_companies
-            )
-            WHERE row_num = 1
-            """
-        ).fetchdf()
-    ).rename({"id": "company_id"})
-
-
-def process_news():
-    execution_date = datetime.strptime(sys.argv[1], "%Y-%m-%d")
-    bucket = os.getenv("BUCKET_NAME")
-    if not bucket:
-        raise RuntimeError("BUCKET_NAME is required")
-    parquet_path = get_parquet_path_by_date(
-        bucket, "news", execution_date.strftime("%Y%m%d")
+def transform_news_topics(
+    news: DataFrame, news_ids: DataFrame, topic_ids: DataFrame
+) -> DataFrame:
+    return (
+        news.select("url", explode(col("topics")).alias("topic_data"))
+        .select(
+            "url",
+            col("topic_data.topic").alias("name"),
+            col("topic_data.relevance_score")
+            .cast(DoubleType())
+            .alias("relevance_score"),
+        )
+        .dropna(subset=["url", "name", "relevance_score"])
+        .join(broadcast(topic_ids), on="name", how="inner")
+        .join(broadcast(news_ids), on="url", how="inner")
+        .select("new_id", "topic_id", "relevance_score")
+        .dropDuplicates(["new_id", "topic_id"])
     )
-    print("Reading news Parquet for:", execution_date.date())
 
-    spark = get_spark_session()
+
+def transform_news_companies(
+    news: DataFrame, news_ids: DataFrame, company_ids: DataFrame
+) -> DataFrame:
+    return (
+        news.select("url", explode(col("ticker_sentiment")).alias("sentiment"))
+        .select(
+            "url",
+            col("sentiment.ticker").alias("ticker"),
+            col("sentiment.relevance_score")
+            .cast(DoubleType())
+            .alias("relevance_score"),
+            col("sentiment.ticker_sentiment_score")
+            .cast(DoubleType())
+            .alias("ticker_sentiment_score"),
+            col("sentiment.ticker_sentiment_label").alias(
+                "ticker_sentiment_label"
+            ),
+        )
+        .dropna(
+            subset=[
+                "url",
+                "ticker",
+                "relevance_score",
+                "ticker_sentiment_score",
+            ]
+        )
+        .join(broadcast(company_ids), on="ticker", how="inner")
+        .join(broadcast(news_ids), on="url", how="inner")
+        .select(
+            "new_id",
+            "company_id",
+            "ticker_sentiment_score",
+            "ticker_sentiment_label",
+            "relevance_score",
+        )
+        .dropDuplicates(["new_id", "company_id"])
+    )
+
+
+def process_news() -> None:
+    execution_date = execution_date_argument()
+    spark = create_spark_session("process_news")
+    source = None
     try:
-        df = spark.read.parquet(parquet_path)
-        if df.rdd.isEmpty():
-            print(f"No news data for {execution_date.date()}.")
+        source = spark.read.parquet(s3a_parquet_uri("news", execution_date)).cache()
+        if source.isEmpty():
+            print(f"No news data for {execution_date.date()}")
             return
 
-        with duckdb.connect(duckdb_path()) as conn:
-            conn.execute("BEGIN TRANSACTION")
-            try:
-                topics = (
-                    df.select(explode(col("topics")).alias("topic"))
-                    .select("topic.topic")
-                    .distinct()
-                    .withColumnRenamed("topic", "name")
-                    .toPandas()
+        with duckdb.connect(duckdb_path()) as conn, transaction(conn):
+            topics = transform_topics(source)
+            register_spark_frame(conn, "incoming_topics", topics)
+            conn.execute(
+                """
+                INSERT INTO dim_topics (name)
+                SELECT name FROM incoming_topics
+                ON CONFLICT (name) DO NOTHING
+                """
+            )
+
+            time_id = ensure_time(conn, execution_date)
+            daily_news = transform_news(source, time_id)
+            row_count = register_spark_frame(conn, "incoming_news", daily_news)
+            conn.execute(
+                """
+                INSERT INTO dim_news (
+                    title, url, time_published, authors, summary, source,
+                    overall_sentiment_score, overall_sentiment_label, time_id
                 )
-                conn.register("temp_topics", topics)
+                SELECT title, url, time_published, authors, summary, source,
+                       overall_sentiment_score, overall_sentiment_label, time_id
+                FROM incoming_news
+                ON CONFLICT (url) DO NOTHING
+                """
+            )
+
+            news_ids = spark.createDataFrame(
+                conn.execute("SELECT id AS new_id, url FROM dim_news").fetchdf()
+            )
+            topic_ids = spark.createDataFrame(
+                conn.execute("SELECT id AS topic_id, name FROM dim_topics").fetchdf()
+            )
+            company_ids = spark.createDataFrame(
                 conn.execute(
                     """
-                    INSERT INTO dim_topics (name)
-                    SELECT name FROM temp_topics
-                    ON CONFLICT (name) DO NOTHING
-                    """
-                )
-
-                conn.execute(
-                    """
-                    INSERT INTO dim_time (date, day_of_week, month, quarter, year)
-                    VALUES (?, ?, ?, ?, ?)
-                    ON CONFLICT (date) DO NOTHING
-                    """,
-                    [
-                        execution_date.date(),
-                        execution_date.strftime("%A"),
-                        execution_date.strftime("%B"),
-                        (execution_date.month - 1) // 3 + 1,
-                        execution_date.year,
-                    ],
-                )
-                time_id = int(
-                    conn.execute(
-                        "SELECT id FROM dim_time WHERE date = ?", [execution_date.date()]
-                    ).fetchone()[0]
-                )
-
-                news_df = df.withColumn("time_id", lit(time_id)).withColumn(
-                    "time_published",
-                    to_timestamp(col("time_published"), "yyyyMMdd'T'HHmmss"),
-                )
-                conn.register("temp_news", news_df.toPandas())
-                conn.execute(
-                    """
-                    INSERT INTO dim_news (
-                        title, url, time_published, authors, summary, source,
-                        overall_sentiment_score, overall_sentiment_label, time_id
+                    SELECT id AS company_id, ticker
+                    FROM (
+                        SELECT id, ticker,
+                               ROW_NUMBER() OVER (
+                                   PARTITION BY ticker
+                                   ORDER BY is_delisted ASC,
+                                            updated_time DESC NULLS LAST,
+                                            id DESC
+                               ) AS row_num
+                        FROM dim_companies
                     )
-                    SELECT title, url, time_published, authors, summary, source,
-                           overall_sentiment_score, overall_sentiment_label, time_id
-                    FROM temp_news
-                    ON CONFLICT (url) DO UPDATE SET
-                        title = EXCLUDED.title,
-                        time_published = EXCLUDED.time_published,
-                        authors = EXCLUDED.authors,
-                        summary = EXCLUDED.summary,
-                        source = EXCLUDED.source,
-                        overall_sentiment_score = EXCLUDED.overall_sentiment_score,
-                        overall_sentiment_label = EXCLUDED.overall_sentiment_label,
-                        time_id = EXCLUDED.time_id
+                    WHERE row_num = 1
                     """
-                )
+                ).fetchdf()
+            )
 
-                news_ids = pl.from_pandas(
-                    conn.execute("SELECT id, url FROM dim_news").fetchdf()
-                ).rename({"id": "new_id"})
-                topic_ids = pl.from_pandas(
-                    conn.execute("SELECT id, name FROM dim_topics").fetchdf()
-                ).rename({"id": "topic_id"})
+            news_topics = transform_news_topics(source, news_ids, topic_ids)
+            register_spark_frame(conn, "incoming_news_topics", news_topics)
+            conn.execute(
+                """
+                INSERT INTO fact_news_topics (new_id, topic_id, relevance_score)
+                SELECT new_id, topic_id, relevance_score FROM incoming_news_topics
+                ON CONFLICT (new_id, topic_id) DO UPDATE SET
+                    relevance_score = EXCLUDED.relevance_score
+                """
+            )
 
-                news_topics = pl.from_pandas(
-                    df.select(explode(col("topics")).alias("topic"), col("url"))
-                    .select(
-                        col("topic.relevance_score").alias("relevance_score"),
-                        col("topic.topic").alias("name"),
-                        col("url"),
-                    )
-                    .toPandas()
+            news_companies = transform_news_companies(
+                source, news_ids, company_ids
+            )
+            register_spark_frame(conn, "incoming_news_companies", news_companies)
+            conn.execute(
+                """
+                INSERT INTO fact_news_companies (
+                    new_id, company_id, ticker_sentiment_score,
+                    ticker_sentiment_label, relevance_score
                 )
-                news_topics = news_topics.join(topic_ids, on="name", how="inner").join(
-                    news_ids, on="url", how="inner"
-                )
-                conn.register("temp_news_topics", news_topics.to_arrow())
-                conn.execute(
-                    """
-                    INSERT INTO fact_news_topics (new_id, topic_id, relevance_score)
-                    SELECT new_id, topic_id, relevance_score FROM temp_news_topics
-                    ON CONFLICT (new_id, topic_id) DO UPDATE SET
-                        relevance_score = EXCLUDED.relevance_score
-                    """
-                )
-
-                news_companies = pl.from_pandas(
-                    df.select(
-                        explode(col("ticker_sentiment")).alias("ticker_sentiment"),
-                        col("url"),
-                    )
-                    .select(
-                        col("ticker_sentiment.ticker").alias("ticker"),
-                        col("ticker_sentiment.ticker_sentiment_score").alias(
-                            "ticker_sentiment_score"
-                        ),
-                        col("ticker_sentiment.ticker_sentiment_label").alias(
-                            "ticker_sentiment_label"
-                        ),
-                        col("ticker_sentiment.relevance_score").alias("relevance_score"),
-                        col("url"),
-                    )
-                    .toPandas()
-                )
-                news_companies = news_companies.join(
-                    _latest_company_ids(conn), on="ticker", how="inner"
-                ).join(news_ids, on="url", how="inner")
-                conn.register("temp_news_companies", news_companies.to_arrow())
-                conn.execute(
-                    """
-                    INSERT INTO fact_news_companies (
-                        new_id, company_id, ticker_sentiment_score,
-                        ticker_sentiment_label, relevance_score
-                    )
-                    SELECT new_id, company_id, ticker_sentiment_score,
-                           ticker_sentiment_label, relevance_score
-                    FROM temp_news_companies
-                    ON CONFLICT (new_id, company_id) DO UPDATE SET
-                        ticker_sentiment_score = EXCLUDED.ticker_sentiment_score,
-                        ticker_sentiment_label = EXCLUDED.ticker_sentiment_label,
-                        relevance_score = EXCLUDED.relevance_score
-                    """
-                )
-                conn.execute("COMMIT")
-            except Exception:
-                conn.execute("ROLLBACK")
-                raise
-        print("News data loaded successfully.")
+                SELECT new_id, company_id, ticker_sentiment_score,
+                       ticker_sentiment_label, relevance_score
+                FROM incoming_news_companies
+                ON CONFLICT (new_id, company_id) DO UPDATE SET
+                    ticker_sentiment_score = EXCLUDED.ticker_sentiment_score,
+                    ticker_sentiment_label = EXCLUDED.ticker_sentiment_label,
+                    relevance_score = EXCLUDED.relevance_score
+                """
+            )
+        print(f"Loaded {row_count} news rows into DuckDB")
     finally:
+        if source is not None:
+            source.unpersist()
         spark.stop()
 
 

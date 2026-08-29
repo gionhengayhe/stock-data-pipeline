@@ -1,123 +1,113 @@
-import os
-import sys
-from datetime import datetime
-
-import boto3
 import duckdb
-import polars as pl
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_unixtime, lit
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import broadcast, col, from_unixtime, lit
 
 from scripts.common.config import duckdb_path
+from scripts.common.spark import (
+    create_spark_session,
+    execution_date_argument,
+    s3a_parquet_uri,
+)
+from scripts.common.warehouse import ensure_time, register_spark_frame, transaction
 
 
-def get_spark_session():
-    """Create a Spark session configured for S3 access."""
+def transform_ohlcs(
+    candles: DataFrame, companies: DataFrame, time_id: int
+) -> DataFrame:
     return (
-        SparkSession.builder.appName("process_ohlcs")
-        .master("spark://spark-master:7077")
-        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
-        .config("spark.hadoop.fs.s3a.access.key", os.getenv("AWS_ACCESS_KEY_ID"))
-        .config("spark.hadoop.fs.s3a.secret.key", os.getenv("AWS_SECRET_ACCESS_KEY"))
-        .getOrCreate()
+        candles.join(broadcast(companies), on="ticker", how="inner")
+        .filter(col("volume_weighted").isNotNull())
+        .withColumn("time_id", lit(time_id))
+        .withColumn(
+            "time_stamp",
+            from_unixtime(col("time_stamp") / 1000).cast("timestamp"),
+        )
+        .fillna({"is_otc": False})
+        .select(
+            "company_id",
+            "time_id",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "volume_weighted",
+            "time_stamp",
+            "num_of_trades",
+            "is_otc",
+        )
+        .dropDuplicates(["company_id", "time_id"])
     )
 
 
-def get_parquet_path_by_date(bucket: str, prefix: str, execution_date: str) -> str:
-    target_key = f"{prefix}/crawl_{prefix}-{execution_date}.parquet"
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-        region_name=os.getenv("AWS_REGION"),
-    )
-    response = s3.list_objects_v2(Bucket=bucket, Prefix=target_key)
-    files = [obj["Key"] for obj in response.get("Contents", []) if obj["Key"] == target_key]
-    if not files:
-        raise FileNotFoundError(f"No Parquet file found for {execution_date} at prefix {prefix}")
-    return f"s3a://{bucket}/{files[0]}"
-
-
-def process_ohlcs():
-    execution_date = datetime.strptime(sys.argv[1], "%Y-%m-%d")
-    bucket = os.getenv("BUCKET_NAME")
-    if not bucket:
-        raise RuntimeError("BUCKET_NAME is required")
-    parquet_path = get_parquet_path_by_date(
-        bucket, "ohlcs", execution_date.strftime("%Y%m%d")
-    )
-    print("Reading OHLC Parquet for:", execution_date.date())
-
-    spark = get_spark_session()
+def process_ohlcs() -> None:
+    execution_date = execution_date_argument()
+    spark = create_spark_session("process_ohlcs")
     try:
-        df = spark.read.parquet(parquet_path)
-        if df.rdd.isEmpty():
-            print(f"No OHLC data for {execution_date.date()}; market may be closed.")
+        source = spark.read.parquet(s3a_parquet_uri("ohlcs", execution_date))
+        if source.isEmpty():
+            print(f"No OHLC data for {execution_date.date()}; market may be closed")
             return
 
-        with duckdb.connect(duckdb_path()) as conn:
-            conn.execute("BEGIN TRANSACTION")
-            try:
-                conn.execute(
-                    """
-                    INSERT INTO dim_time (date, day_of_week, month, quarter, year)
-                    VALUES (?, ?, ?, ?, ?)
-                    ON CONFLICT (date) DO NOTHING
-                    """,
-                    [
-                        execution_date.date(),
-                        execution_date.strftime("%A"),
-                        execution_date.strftime("%B"),
-                        (execution_date.month - 1) // 3 + 1,
-                        execution_date.year,
-                    ],
-                )
-                time_id = int(
-                    conn.execute(
-                        "SELECT id FROM dim_time WHERE date = ?", [execution_date.date()]
-                    ).fetchone()[0]
-                )
-                companies = spark.createDataFrame(
-                    conn.execute("SELECT id, ticker FROM dim_companies").fetchdf()
-                ).dropDuplicates(["ticker"])
-
-                transformed = (
-                    df.join(companies, on="ticker", how="left")
-                    .filter(col("id").isNotNull() & col("volume_weighted").isNotNull())
-                    .withColumnRenamed("id", "company_id")
-                    .withColumn("time_id", lit(time_id))
-                    .withColumn(
-                        "time_stamp",
-                        from_unixtime(col("time_stamp") / 1000).cast("timestamp"),
+        with duckdb.connect(duckdb_path()) as conn, transaction(conn):
+            time_id = ensure_time(conn, execution_date)
+            company_rows = conn.execute(
+                """
+                WITH existing_mapping AS (
+                    SELECT DISTINCT c.id AS company_id, c.ticker
+                    FROM fact_candles AS fact
+                    JOIN dim_companies AS c ON c.id = fact.company_id
+                    WHERE fact.time_id = ?
+                ),
+                canonical_mapping AS (
+                    SELECT id AS company_id, ticker
+                    FROM (
+                        SELECT id, ticker,
+                               ROW_NUMBER() OVER (
+                                   PARTITION BY ticker
+                                   ORDER BY is_delisted ASC,
+                                            updated_time DESC NULLS LAST,
+                                            id DESC
+                               ) AS row_num
+                        FROM dim_companies
                     )
+                    WHERE row_num = 1
                 )
-                conn.register("temp_candles", pl.from_pandas(transformed.toPandas()).to_arrow())
-                conn.execute(
-                    """
-                    INSERT INTO fact_candles (
-                        company_id, time_id, open, high, low, close, volume,
-                        volume_weighted, time_stamp, num_of_trades, is_otc
-                    )
-                    SELECT company_id, time_id, open, high, low, close, volume,
-                           volume_weighted, time_stamp, num_of_trades, is_otc
-                    FROM temp_candles
-                    ON CONFLICT (company_id, time_id) DO UPDATE SET
-                        open = EXCLUDED.open,
-                        high = EXCLUDED.high,
-                        low = EXCLUDED.low,
-                        close = EXCLUDED.close,
-                        volume = EXCLUDED.volume,
-                        volume_weighted = EXCLUDED.volume_weighted,
-                        time_stamp = EXCLUDED.time_stamp,
-                        num_of_trades = EXCLUDED.num_of_trades,
-                        is_otc = EXCLUDED.is_otc
-                    """
+                SELECT company_id, ticker FROM existing_mapping
+                UNION ALL
+                SELECT company_id, ticker FROM canonical_mapping AS canonical
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM existing_mapping AS existing
+                    WHERE existing.ticker = canonical.ticker
                 )
-                conn.execute("COMMIT")
-            except Exception:
-                conn.execute("ROLLBACK")
-                raise
-        print("OHLC data loaded successfully.")
+                """,
+                [time_id],
+            ).fetchdf()
+            companies = spark.createDataFrame(company_rows)
+            candles = transform_ohlcs(source, companies, time_id)
+            row_count = register_spark_frame(conn, "incoming_candles", candles)
+            conn.execute(
+                """
+                INSERT INTO fact_candles (
+                    company_id, time_id, open, high, low, close, volume,
+                    volume_weighted, time_stamp, num_of_trades, is_otc
+                )
+                SELECT company_id, time_id, open, high, low, close, volume,
+                       volume_weighted, time_stamp, num_of_trades, is_otc
+                FROM incoming_candles
+                ON CONFLICT (company_id, time_id) DO UPDATE SET
+                    open = EXCLUDED.open,
+                    high = EXCLUDED.high,
+                    low = EXCLUDED.low,
+                    close = EXCLUDED.close,
+                    volume = EXCLUDED.volume,
+                    volume_weighted = EXCLUDED.volume_weighted,
+                    time_stamp = EXCLUDED.time_stamp,
+                    num_of_trades = EXCLUDED.num_of_trades,
+                    is_otc = EXCLUDED.is_otc
+                """
+            )
+        print(f"Loaded {row_count} OHLC rows into DuckDB")
     finally:
         spark.stop()
 

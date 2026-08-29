@@ -1,6 +1,5 @@
-import os
-
-from scripts.common.files import write_json_atomic
+from scripts.common.config import DATA_ROOT, required_env
+from scripts.common.files import dated_file, write_json_atomic
 from scripts.common.http import get_json
 
 
@@ -9,9 +8,7 @@ def crawl_ohlcs(**kwargs):
     date_crawl = execution_date.strftime("%Y-%m-%d")
 
     # API key for authentication
-    api_key = os.getenv("POLYGON_API_KEY")
-    if not api_key:
-        raise RuntimeError("POLYGON_API_KEY is required")
+    api_key = required_env("POLYGON_API_KEY")
 
     # Set parameters for the API request
     adjusted = "true"
@@ -28,10 +25,9 @@ def crawl_ohlcs(**kwargs):
     data = payload.get("results", [])
 
     # Get execution date formatted as YYYYMMDD
-    date = execution_date.strftime("%Y%m%d")
-
-    # Define the file path for saving the JSON data
-    path = r"/opt/airflow/data/raw/ohlcs/crawl_ohlcs-" + f"{date}.json"
+    path = dated_file(
+        DATA_ROOT / "raw" / "ohlcs", "crawl_ohlcs", execution_date, ".json"
+    )
     write_json_atomic(data, path)
 
     # Print success message with total OHLCs and file path

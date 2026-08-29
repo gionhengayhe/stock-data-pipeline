@@ -1,28 +1,17 @@
-import boto3
-import os
+from scripts.common.config import DATA_ROOT
+from scripts.common.files import dated_file
+from scripts.common.storage import upload_parquet
 
 
-def upload_to_s3(**kwargs):
-    client = boto3.client(
-        's3',
-        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-        region_name=os.getenv("AWS_REGION")
-    )
-    bucket_name = os.getenv("BUCKET_NAME")
-    if not bucket_name:
-        raise RuntimeError("BUCKET_NAME is required")
-    print("Uploading to bucket:", bucket_name)
-    local_folder = kwargs['local_folder']
-    execution_date = kwargs['execution_date'].strftime("%Y%m%d")
-    uploaded = 0
-    for root, _, files in os.walk(local_folder):
-        for file in files:
-            if file.endswith(f'{execution_date}.parquet'):
-                local_path = os.path.join(root, file)
-                s3_key = os.path.relpath(local_path, local_folder).replace("\\", "/")
-                client.upload_file(local_path, bucket_name, s3_key)
-                uploaded += 1
-                print(f"Uploaded: {local_path} -> s3://{bucket_name}/{s3_key}")
-    if uploaded == 0:
-        raise FileNotFoundError(f"No Parquet artifacts found for {execution_date}")
+def upload_daily_artifacts(**context) -> None:
+    execution_date = context["execution_date"]
+    for dataset in ("companies", "news", "ohlcs"):
+        path = dated_file(
+            DATA_ROOT / "parquet" / dataset,
+            f"crawl_{dataset}",
+            execution_date,
+            ".parquet",
+        )
+        if not path.exists():
+            raise FileNotFoundError(f"Expected daily artifact does not exist: {path}")
+        upload_parquet(path, dataset, execution_date)

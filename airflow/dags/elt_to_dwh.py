@@ -1,27 +1,16 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime, timedelta
 from airflow.utils.task_group import TaskGroup
 from airflow.utils.trigger_rule import TriggerRule
-from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from scripts.elt_to_dwh.create_dwh import create_dwh
 from scripts.elt_to_dwh.extract.crawl_news import crawl_news
 from scripts.elt_to_dwh.extract.crawl_ohlcs import crawl_ohlcs
 from scripts.elt_to_dwh.load.load_api_to_parquet import convert_news_to_parquet, convert_ohlcs_to_parquet
 from scripts.elt_to_dwh.load.load_db_to_parquet import load_db_to_parquet
-from scripts.elt_to_dwh.load.load_parquet_to_datalake import upload_to_s3
-from scripts.elt_to_dwh.transform.process_companies import process_companies
+from scripts.elt_to_dwh.load.load_parquet_to_datalake import upload_daily_artifacts
 from scripts.quality.validate_dwh import validate_dwh
-
-
-SPARK_PYTHON_CONF = {
-    "spark.pyspark.python": "/usr/local/bin/python3.12",
-    "spark.pyspark.driver.python": "/usr/local/bin/python3.12",
-}
-SPARK_PYTHON_ENV = {
-    "PYSPARK_PYTHON": "/usr/local/bin/python3.12",
-    "PYSPARK_DRIVER_PYTHON": "/usr/local/bin/python3.12",
-}
 
 
 DEFAULT_ARGS = {
@@ -30,6 +19,29 @@ DEFAULT_ARGS = {
     "retry_delay": timedelta(minutes=5),
     "execution_timeout": timedelta(minutes=45),
 }
+
+SPARK_CONF = {
+    "spark.pyspark.python": "/usr/local/bin/python3.12",
+    "spark.pyspark.driver.python": "/usr/local/bin/python3.12",
+}
+SPARK_ENV = {
+    "PYSPARK_PYTHON": "/usr/local/bin/python3.12",
+    "PYSPARK_DRIVER_PYTHON": "/usr/local/bin/python3.12",
+}
+
+
+def spark_job(
+    task_id: str, trigger_rule: TriggerRule = TriggerRule.ALL_SUCCESS
+) -> SparkSubmitOperator:
+    return SparkSubmitOperator(
+        task_id=task_id,
+        application=f"/opt/airflow/scripts/elt_to_dwh/transform/{task_id}.py",
+        conn_id="spark_conn",
+        conf=SPARK_CONF,
+        env_vars=SPARK_ENV,
+        application_args=["{{ ds }}"],
+        trigger_rule=trigger_rule,
+    )
 
 with DAG(
     dag_id='elt_to_dwh',
@@ -70,37 +82,15 @@ with DAG(
 
     load_to_datalake_task = PythonOperator(
         task_id='load_to_datalake',
-        python_callable=upload_to_s3,
-        op_kwargs={
-            'local_folder': '/opt/airflow/data/parquet'
-        }
+        python_callable=upload_daily_artifacts,
     )
     with TaskGroup('transform_task') as transform_group:
-        process_companies_task = PythonOperator(
-            task_id='process_companies',
-            python_callable=process_companies
-        )
-        process_news_task = SparkSubmitOperator(
-            task_id='process_news',
-            application='/opt/airflow/scripts/elt_to_dwh/transform/process_news.py',
-            conn_id='spark_conn',
-            conf=SPARK_PYTHON_CONF,
-            env_vars=SPARK_PYTHON_ENV,
-            application_args=["{{ ds }}"],
-            # DuckDB is a single-writer local warehouse. Serialize this task
-            # after OHLC, but still run news when the OHLC branch fails.
-            trigger_rule=TriggerRule.ALL_DONE,
-        )
+        process_companies_task = spark_job("process_companies")
+        process_news_task = spark_job("process_news", TriggerRule.ALL_DONE)
+        process_ohlcs_task = spark_job("process_ohlcs")
 
-        process_ohlcs_task = SparkSubmitOperator(
-            task_id='process_ohlcs',
-            application='/opt/airflow/scripts/elt_to_dwh/transform/process_ohlcs.py',
-            conn_id='spark_conn',
-            conf=SPARK_PYTHON_CONF,
-            env_vars=SPARK_PYTHON_ENV,
-            application_args=["{{ ds }}"],
-        )
-
+        # DuckDB is a local single-writer warehouse, so the Spark jobs commit
+        # their distributed results one at a time.
         process_companies_task >> process_ohlcs_task >> process_news_task
 
     validate_dwh_task = PythonOperator(

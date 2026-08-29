@@ -1,7 +1,7 @@
-import os
 from datetime import datetime, time, timedelta
 
-from scripts.common.files import write_json_atomic
+from scripts.common.config import DATA_ROOT, required_env
+from scripts.common.files import dated_file, write_json_atomic
 from scripts.common.http import get_json
 
 
@@ -39,9 +39,7 @@ def _fetch_news_range(start: datetime, end: datetime, api_key: str, depth: int =
 
 def crawl_news(**kwargs):
     execution_date = kwargs["execution_date"]
-    api_key = os.getenv("ALPHA_VANTAGE_API_KEY")
-    if not api_key:
-        raise RuntimeError("ALPHA_VANTAGE_API_KEY is required")
+    api_key = required_env("ALPHA_VANTAGE_API_KEY")
 
     day = execution_date.date()
     start = datetime.combine(day, time.min)
@@ -55,12 +53,9 @@ def crawl_news(**kwargs):
         deduplicated[key] = row
     news = list(deduplicated.values())
 
-    # Get execution date formatted as YYYYMMDD
-    date = execution_date.strftime("%Y%m%d")
-
-    # Define the file path for saving the JSON data
-    path = r"/opt/airflow/data/raw/news/crawl_news-" + f"{date}.json"
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    path = dated_file(
+        DATA_ROOT / "raw" / "news", "crawl_news", execution_date, ".json"
+    )
 
     write_json_atomic(news, path)
 
