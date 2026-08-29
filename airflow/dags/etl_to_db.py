@@ -1,6 +1,6 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow.utils.task_group import TaskGroup
 
 from scripts.etl_to_db.create_db import create_db, create_tables, create_indexes
@@ -9,11 +9,22 @@ from scripts.etl_to_db.extract.crawl_markets import crawl_markets
 from scripts.etl_to_db.load.load_to_db import load_to_db
 from scripts.etl_to_db.transform.transform_to_db import transform_to_db
 
+
+DEFAULT_ARGS = {
+    "owner": "data-engineering",
+    "retries": 2,
+    "retry_delay": timedelta(minutes=5),
+    "execution_timeout": timedelta(minutes=30),
+}
+
 with DAG(
     dag_id='etl_to_db',
     start_date=datetime(2025, 5, 1),
-    schedule_interval='@monthly',
-    catchup=True
+    schedule='@monthly',
+    catchup=False,
+    max_active_runs=1,
+    default_args=DEFAULT_ARGS,
+    tags=["finance", "etl", "metadata"],
 ) as dag:
     with TaskGroup(group_id='ddl_task') as ddl_group:
         create_database_task = PythonOperator(

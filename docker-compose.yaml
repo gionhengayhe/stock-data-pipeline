@@ -2,13 +2,25 @@ services:
   database:
     image: postgres:14-alpine
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=datasource
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-datasource}
     ports:
       - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   airflow:
     build: ./airflow/plugins
+    depends_on:
+      database:
+        condition: service_healthy
+      spark-master:
+        condition: service_started
     volumes:
       - ./data:/opt/airflow/data
       - ./logs:/opt/airflow/logs
@@ -18,20 +30,57 @@ services:
     ports:
       - 8080:8080
     environment:
-      - PYTHONPATH=/opt/airflow/scripts:/opt/airflow
+      PYTHONPATH: /opt/airflow/scripts:/opt/airflow
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-datasource}
+      AIRFLOW_ADMIN_USER: ${AIRFLOW_ADMIN_USER:-admin}
+      AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:-admin}
+      AIRFLOW_ADMIN_FIRSTNAME: ${AIRFLOW_ADMIN_FIRSTNAME:-Data}
+      AIRFLOW_ADMIN_LASTNAME: ${AIRFLOW_ADMIN_LASTNAME:-Engineer}
+      AIRFLOW_ADMIN_EMAIL: ${AIRFLOW_ADMIN_EMAIL:-admin@example.com}
+      AIRFLOW_CONN_SPARK_CONN: spark://spark-master:7077
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      PYTHONDONTWRITEBYTECODE: "1"
+      DUCKDB_PATH: /opt/airflow/database/config_dwh/mydb.duckdb
     env_file:
       - .env
-    command: bash -c '(airflow db init && airflow users create --username admin --password admin --firstname Duyen --lastname Luu --role Admin --email luuduyen1206@gmail.com); airflow webserver & airflow scheduler'
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        airflow db migrate
+        if ! airflow users list | grep -q "$${AIRFLOW_ADMIN_USER}"; then
+          airflow users create \
+            --username "$${AIRFLOW_ADMIN_USER}" \
+            --password "$${AIRFLOW_ADMIN_PASSWORD}" \
+            --firstname "$${AIRFLOW_ADMIN_FIRSTNAME}" \
+            --lastname "$${AIRFLOW_ADMIN_LASTNAME}" \
+            --role Admin \
+            --email "$${AIRFLOW_ADMIN_EMAIL}"
+        fi
+        airflow webserver &
+        exec airflow scheduler
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   spark-master:
     build: .
-    environment:
-      - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - SPARK_MASTER_WEBUI_PORT=8081
+    entrypoint: ["/opt/spark/bin/spark-class"]
+    command:
+      - org.apache.spark.deploy.master.Master
+      - --host
+      - spark-master
+      - --port
+      - "7077"
+      - --webui-port
+      - "8081"
     ports:
       - "7077:7077"
       - "8081:8081"
@@ -40,15 +89,14 @@ services:
 
   spark-worker:
     build: .
-    environment:
-      - SPARK_MODE=worker
-      - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=2G
-      - SPARK_WORKER_CORES=2
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
+    entrypoint: ["/opt/spark/bin/spark-class"]
+    command:
+      - org.apache.spark.deploy.worker.Worker
+      - --cores
+      - "2"
+      - --memory
+      - 2G
+      - spark://spark-master:7077
     depends_on:
       - spark-master
     volumes:
@@ -58,10 +106,9 @@ services:
     ports:
       - 5000:5000
     volumes:
-      - ./database:/opt/airflow/database
+      - ./database:/opt/airflow/database:ro
+    environment:
+      DUCKDB_PATH: /opt/airflow/database/config_dwh/mydb.duckdb
 
 volumes:
-  data:
-  airflow:
-  database:
-  logs:
+  postgres_data:
