@@ -1,10 +1,10 @@
 import psycopg2
 import json
 import os
-import glob
-import hashlib
 import re
 from datetime import datetime
+
+from scripts.common.config import postgres_config
 
 def get_file_by_date(directory: str, date_str: str) -> str:
     """
@@ -36,15 +36,6 @@ def read_file(directory, date_str: str):
         print(f"No JSON files found in {directory}.")
         return []
 
-def compute_hash_row(row: dict) -> str:
-    """
-    Compute a hash for a row of data to detect changes.
-    :param row: A dictionary representing a row of data.
-    :return: A string representing the MD5 hash of the row.
-    """
-    s = json.dumps(row, sort_keys=True, default=str)
-    return hashlib.md5(s.encode()).hexdigest()
-
 def insert_or_update_data(data, table_name, columns, conflict_columns, has_hash_row: bool):
     """
     Insert or update data in a PostgreSQL table.
@@ -54,12 +45,11 @@ def insert_or_update_data(data, table_name, columns, conflict_columns, has_hash_
     :param conflict_columns: List of column names to check for conflicts (usually unique identifiers).
     :param has_hash_row: bool, whether the table has a hash_row column to detect changes.
     """
-    conn = psycopg2.connect(
-        host="database",
-        database="datasource",
-        user="postgres",
-        password="postgres",
-    )
+    if not data:
+        print(f"No rows to load into '{table_name}'")
+        return
+
+    conn = psycopg2.connect(**postgres_config())
     cur = conn.cursor()
 
     count = 0
@@ -92,17 +82,20 @@ def insert_or_update_data(data, table_name, columns, conflict_columns, has_hash_
             """
 
         try:
-            # print("Query:", query)
             cur.execute(query, values if not has_hash_row else values + [datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
             if cur.rowcount > 0:
                 count += 1
-        except Exception as e:
-            print(f"Error with row {row}: {e}")
+        except Exception:
             conn.rollback()
+            cur.close()
+            conn.close()
+            raise
 
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
 
     print(f"{count} row(s) affected in '{table_name}'")
 
@@ -114,12 +107,7 @@ def get_foreign_key_map(table_name, key_columns: list, id_column="id"):
     :param id_column: Name of the column that contains the ID (default is "id").
     :return: A dictionary mapping foreign key values to their corresponding IDs.
     """
-    conn = psycopg2.connect(
-        host="database",
-        database="datasource",
-        user="postgres",
-        password="postgres",
-    )
+    conn = psycopg2.connect(**postgres_config())
     cur = conn.cursor()
     cols_str = ", ".join([id_column] + key_columns)
     cur.execute(f"SELECT {cols_str} FROM {table_name}")
@@ -148,16 +136,17 @@ def load_to_db(**kwargs):
     #Load exchanges
     exchanges = read_file("/opt/airflow/data/processed/exchanges", execution_date.strftime("%Y%m%d"))
     region_map = get_foreign_key_map("regions", ["region"])
+    valid_exchanges = []
     for row in exchanges:
         region = row.get("region")
         region_id = region_map.get(region)
         if region_id:
             row["region_id"] = region_id
+            valid_exchanges.append(row)
         else:
             print(f"Region '{region}' not found in regions table. Skipping row: {row}")
-            continue
     insert_or_update_data(
-        data=exchanges,
+        data=valid_exchanges,
         table_name="exchanges",
         columns=["name", "region_id"],
         conflict_columns=["name"],
@@ -186,6 +175,7 @@ def load_to_db(**kwargs):
     industry_map = get_foreign_key_map("industries", ["industry", "sector"])
     exchange_map = get_foreign_key_map("exchanges", ["name"])
     sic_map = get_foreign_key_map("sic_industries", ["sic_industry", "sic_sector"], "id")
+    valid_companies = []
     for row in companies:
         exchange = row.get("exchange")
         industry = row.get("industry")
@@ -199,20 +189,15 @@ def load_to_db(**kwargs):
         if not exchange_id:
             print(f"Exchange '{exchange}' not found in exchanges table. Skipping row: {row}")
             continue
-        if not industry_id:
-            print(f"Industry '{industry}' and sector '{sector}' not found in industries table. Skipping row: {row}")
-            continue
-        if not sic_id:
-            print(f"SIC Industry '{sic_industry}' and SIC Sector '{sic_sector}' not found in sic_industries table. Skipping row: {row}")
-            continue
         row["exchange_id"] = exchange_id
         row["industry_id"] = industry_id
         row["sic_id"] = sic_id
+        valid_companies.append(row)
     insert_or_update_data(
-        data=companies,
+        data=valid_companies,
         table_name="companies",
         columns=["exchange_id", "industry_id","sic_id", "name", "ticker", "is_delisted", "category", "currency", "location"],
-        conflict_columns=["is_delisted", "ticker"],
+        conflict_columns=["ticker", "is_delisted"],
         has_hash_row=True,
     )
 

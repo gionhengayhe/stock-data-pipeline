@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS regions (
     local_close TIME NOT NULL,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     hash_row TEXT GENERATED ALWAYS AS (
-        md5(region || local_open::text || local_close::text)
+        md5(region || '|' || local_open::text || '|' || local_close::text)
     ) STORED
 );
 
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS exchanges (
     name VARCHAR(100) UNIQUE NOT NULL,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     hash_row TEXT GENERATED ALWAYS AS (
-        md5(region_id::text || name)
+        md5(region_id::text || '|' || name)
     ) STORED,
     CONSTRAINT fk_exchange_region_id
         FOREIGN KEY(region_id)
@@ -51,8 +51,15 @@ CREATE TABLE IF NOT EXISTS companies (
     location VARCHAR(255),
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     hash_row TEXT GENERATED ALWAYS AS (
-        md5(exchange_id::text || industry_id::text || sic_id::text ||
-            name || ticker || is_delisted::text || category || currency || location)
+        md5(
+            exchange_id::text || '|' ||
+            COALESCE(industry_id::text, '') || '|' ||
+            COALESCE(sic_id::text, '') || '|' ||
+            name || '|' || ticker || '|' || is_delisted::text || '|' ||
+            COALESCE(category, '') || '|' ||
+            COALESCE(currency, '') || '|' ||
+            COALESCE(location, '')
+        )
     ) STORED,
     CONSTRAINT fk_company_region
         FOREIGN KEY(exchange_id)

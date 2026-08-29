@@ -23,7 +23,3 @@ LEFT JOIN industries i
 	ON c.industry_id = i.id
 LEFT JOIN sic_industries s
 	ON c.sic_id = s.id
-WHERE
-    DATE_TRUNC('day', c.updated_time) = DATE_TRUNC('day', CURRENT_DATE)
-    AND DATE_TRUNC('month', c.updated_time) = DATE_TRUNC('month', CURRENT_DATE)
-    AND DATE_TRUNC('year', c.updated_time) = DATE_TRUNC('year', CURRENT_DATE)

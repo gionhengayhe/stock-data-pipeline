@@ -1,3 +1,15 @@
 .env
 .venv
-.logs
+__pycache__/
+*.py[cod]
+.idea/
+.pytest_cache/
+logs/
+tmp/
+
+# Generated pipeline artifacts. Keep small fixtures under tests/fixtures instead.
+data/raw/
+data/processed/
+data/parquet/
+database/config_dwh/*.duckdb
+flask-api/*.xlsx

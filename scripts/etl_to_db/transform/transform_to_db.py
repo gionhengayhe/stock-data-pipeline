@@ -1,6 +1,5 @@
 import os
 import json
-from datetime import datetime
 import re
 
 import polars as pl
@@ -37,8 +36,9 @@ def read_file(directory, date_str: str):
         return []
 
 
-def cleaned_data(data):
-    return data.drop_nulls().unique()
+def cleaned_data(data, required_columns):
+    """Drop rows only when a business-required field is missing."""
+    return data.drop_nulls(subset=required_columns).unique()
 
 def df_to_json(df, file_path):
     """
@@ -66,18 +66,20 @@ def transform_to_db(**kwargs):
             "local_close": item["local_close"],
         } for item in markets
     ]
-    regions_df = cleaned_data(pl.DataFrame(regions_schema))
+    regions_df = cleaned_data(
+        pl.DataFrame(regions_schema), ["region", "local_open", "local_close"]
+    )
     regions_path = f'/opt/airflow/data/processed/regions/regions-{date}.json'
     df_to_json(regions_df, regions_path)
 
     #Transform industries
     industries_schema = [
         {
-            "industry": item["industry"],
-            "sector": item["sector"],
+            "industry": item.get("industry"),
+            "sector": item.get("sector"),
         } for item in companies
     ]
-    industries_df = cleaned_data(pl.DataFrame(industries_schema))
+    industries_df = cleaned_data(pl.DataFrame(industries_schema), ["industry", "sector"])
     industries_path = f'/opt/airflow/data/processed/industries/industries-{date}.json'
     df_to_json(industries_df, industries_path)
 
@@ -85,11 +87,13 @@ def transform_to_db(**kwargs):
     sic_industries_schema = [
         {
             "id": item["sic"],
-            "sic_industry": item["sicIndustry"],
-            "sic_sector": item["sicSector"],
-        } for item in companies if "sic" in item
+            "sic_industry": item.get("sicIndustry"),
+            "sic_sector": item.get("sicSector"),
+        } for item in companies if item.get("sicIndustry") and item.get("sicSector")
     ]
-    sic_industries_df = cleaned_data(pl.DataFrame(sic_industries_schema))
+    sic_industries_df = cleaned_data(
+        pl.DataFrame(sic_industries_schema), ["sic_industry", "sic_sector"]
+    )
     sic_industries_path = f'/opt/airflow/data/processed/sic_industries/sic_industries-{date}.json'
     df_to_json(sic_industries_df, sic_industries_path)
 
@@ -103,28 +107,30 @@ def transform_to_db(**kwargs):
         for exchange in item["primary_exchanges"].split(",")
         if item.get("primary_exchanges")
     ]
-    exchanges_df = cleaned_data(pl.DataFrame(exchanges_schema))
+    exchanges_df = cleaned_data(pl.DataFrame(exchanges_schema), ["name", "region"])
     exchanges_path = f'/opt/airflow/data/processed/exchanges/exchanges-{date}.json'
     df_to_json(exchanges_df, exchanges_path)
 
     # Transform companies
     companies_schema = [
         {
-            "name": item["name"],
-            "ticker": item["ticker"],
-            "is_delisted": item["isDelisted"],
-            "category": item["category"],
-            "currency": item["currency"],
-            "location": item["location"],
-            "industry": item["industry"],
-            "sector": item["sector"],
-            "exchange": item["exchange"],
-            "sic_industry": item["sicIndustry"],
-            "sic_sector": item["sicSector"],
+            "name": item.get("name"),
+            "ticker": item.get("ticker"),
+            "is_delisted": item.get("isDelisted"),
+            "category": item.get("category"),
+            "currency": item.get("currency"),
+            "location": item.get("location"),
+            "industry": item.get("industry"),
+            "sector": item.get("sector"),
+            "exchange": item.get("exchange"),
+            "sic_industry": item.get("sicIndustry"),
+            "sic_sector": item.get("sicSector"),
         } for item in companies
     ]
 
-    companies_df = cleaned_data(pl.DataFrame(companies_schema))
+    companies_df = cleaned_data(
+        pl.DataFrame(companies_schema), ["name", "ticker", "is_delisted", "exchange"]
+    )
     # Filter companies based on exchange and currency
     companies_df = companies_df.filter(
         (pl.col("exchange").is_in(["NASDAQ", "NYSE"])) &
