@@ -1,12 +1,9 @@
-import os
-
-from scripts.common.files import write_json_atomic
+from scripts.common.config import DATA_ROOT, required_env
+from scripts.common.files import dated_file, write_json_atomic
 from scripts.common.http import get_json
 
 def crawl_companies(**kwargs):
-    api_key = os.getenv("SEC_API_KEY")
-    if not api_key:
-        raise RuntimeError("SEC_API_KEY is required")
+    api_key = required_env("SEC_API_KEY")
     exchanges = ['NASDAQ', 'NYSE']
 
     list_companies = []
@@ -18,9 +15,12 @@ def crawl_companies(**kwargs):
         list_companies.extend(data)
         print(f"Fetched {len(data)} companies from {exchange} exchange.")
 
-    execution_date = kwargs['execution_date']
-    date = execution_date.strftime('%Y%m%d')
-    file_path = f'/opt/airflow/data/raw/companies/crawl_companies-{date}.json'
+    file_path = dated_file(
+        DATA_ROOT / "raw" / "companies",
+        "crawl_companies",
+        kwargs["execution_date"],
+        ".json",
+    )
     write_json_atomic(list_companies, file_path)
     print(f"The process of crawling {len(list_companies)} companies was successful")
     print(f"Saving at {file_path}")

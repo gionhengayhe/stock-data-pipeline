@@ -1,12 +1,10 @@
 CREATE TABLE IF NOT EXISTS regions (
     id SERIAL PRIMARY KEY,
-    region VARCHAR(50) UNIQUE NOT NULL,
+    region VARCHAR(50) NOT NULL,
     local_open TIME NOT NULL,
     local_close TIME NOT NULL,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    hash_row TEXT GENERATED ALWAYS AS (
-        md5(region || '|' || local_open::text || '|' || local_close::text)
-    ) STORED
+    CONSTRAINT unique_region UNIQUE (region)
 );
 
 CREATE TABLE IF NOT EXISTS industries (
@@ -30,9 +28,6 @@ CREATE TABLE IF NOT EXISTS exchanges (
     region_id INT NOT NULL,
     name VARCHAR(100) UNIQUE NOT NULL,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    hash_row TEXT GENERATED ALWAYS AS (
-        md5(region_id::text || '|' || name)
-    ) STORED,
     CONSTRAINT fk_exchange_region_id
         FOREIGN KEY(region_id)
         REFERENCES regions(id)
@@ -50,17 +45,6 @@ CREATE TABLE IF NOT EXISTS companies (
     currency VARCHAR(10),
     location VARCHAR(255),
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    hash_row TEXT GENERATED ALWAYS AS (
-        md5(
-            exchange_id::text || '|' ||
-            COALESCE(industry_id::text, '') || '|' ||
-            COALESCE(sic_id::text, '') || '|' ||
-            name || '|' || ticker || '|' || is_delisted::text || '|' ||
-            COALESCE(category, '') || '|' ||
-            COALESCE(currency, '') || '|' ||
-            COALESCE(location, '')
-        )
-    ) STORED,
     CONSTRAINT fk_company_region
         FOREIGN KEY(exchange_id)
         REFERENCES exchanges(id),
@@ -72,4 +56,10 @@ CREATE TABLE IF NOT EXISTS companies (
         REFERENCES sic_industries(id),
     CONSTRAINT unique_company_delisted UNIQUE (ticker, is_delisted)
 );
+
+CREATE INDEX IF NOT EXISTS idx_company_time_stamp ON companies(updated_time);
+CREATE INDEX IF NOT EXISTS idx_company_exchange_id ON companies(exchange_id);
+CREATE INDEX IF NOT EXISTS idx_exchange_region_id ON exchanges(region_id);
+CREATE INDEX IF NOT EXISTS idx_company_industry_id ON companies(industry_id);
+CREATE INDEX IF NOT EXISTS idx_company_sic_id ON companies(sic_id);
 
