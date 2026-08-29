@@ -1,3 +1,8 @@
+x-spark-common: &spark-common
+  build: .
+  volumes:
+    - ./scripts:/usr/local/airflow/scripts:ro
+
 services:
   database:
     image: postgres:14-alpine
@@ -6,7 +11,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-datasource}
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -20,7 +25,7 @@ services:
       database:
         condition: service_healthy
       spark-master:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./data:/opt/airflow/data
       - ./logs:/opt/airflow/logs
@@ -28,7 +33,7 @@ services:
       - ./scripts:/opt/airflow/scripts
       - ./database:/opt/airflow/database:rw
     ports:
-      - 8080:8080
+      - "8080:8080"
     environment:
       PYTHONPATH: /opt/airflow/scripts:/opt/airflow
       POSTGRES_HOST: database
@@ -36,12 +41,14 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-datasource}
+      AIRFLOW_DB: ${AIRFLOW_DB:-airflow}
       AIRFLOW_ADMIN_USER: ${AIRFLOW_ADMIN_USER:-admin}
       AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:-admin}
       AIRFLOW_ADMIN_FIRSTNAME: ${AIRFLOW_ADMIN_FIRSTNAME:-Data}
       AIRFLOW_ADMIN_LASTNAME: ${AIRFLOW_ADMIN_LASTNAME:-Engineer}
       AIRFLOW_ADMIN_EMAIL: ${AIRFLOW_ADMIN_EMAIL:-admin@example.com}
       AIRFLOW_CONN_SPARK_CONN: spark://spark-master:7077
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@database:5432/${AIRFLOW_DB:-airflow}
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       PYTHONDONTWRITEBYTECODE: "1"
       DUCKDB_PATH: /opt/airflow/database/config_dwh/mydb.duckdb
@@ -52,6 +59,11 @@ services:
       - -c
       - |
         set -e
+        export PGPASSWORD="$${POSTGRES_PASSWORD}"
+        if ! psql -h "$${POSTGRES_HOST}" -U "$${POSTGRES_USER}" -d postgres \
+          -tAc "SELECT 1 FROM pg_database WHERE datname='$${AIRFLOW_DB}'" | grep -q 1; then
+          createdb -h "$${POSTGRES_HOST}" -U "$${POSTGRES_USER}" "$${AIRFLOW_DB}"
+        fi
         airflow db migrate
         if ! airflow users list | grep -q "$${AIRFLOW_ADMIN_USER}"; then
           airflow users create \
@@ -71,7 +83,7 @@ services:
       retries: 5
 
   spark-master:
-    build: .
+    <<: *spark-common
     entrypoint: ["/opt/spark/bin/spark-class"]
     command:
       - org.apache.spark.deploy.master.Master
@@ -84,11 +96,14 @@ services:
     ports:
       - "7077:7077"
       - "8081:8081"
-    volumes:
-      - ./scripts:/usr/local/airflow/scripts
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8081"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   spark-worker:
-    build: .
+    <<: *spark-common
     entrypoint: ["/opt/spark/bin/spark-class"]
     command:
       - org.apache.spark.deploy.worker.Worker
@@ -98,13 +113,12 @@ services:
       - 2G
       - spark://spark-master:7077
     depends_on:
-      - spark-master
-    volumes:
-      - ./scripts:/usr/local/airflow/scripts
+      spark-master:
+        condition: service_healthy
   flask-api:
     build: ./flask-api
     ports:
-      - 5000:5000
+      - "5000:5000"
     volumes:
       - ./database:/opt/airflow/database:ro
     environment:
