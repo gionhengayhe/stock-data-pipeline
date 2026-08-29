@@ -1,57 +1,52 @@
-import requests
+import os
+from pathlib import Path
+
 import pandas as pd
-import openpyxl
+import requests
 
-# Base URL của Flask API
-BASE_URL = 'http://localhost:5000'
 
-# Danh sách các endpoint cần truy xuất
-endpoints = [
-    'dim_time',
-    'dim_news',
-    'dim_topics',
-    'dim_companies',
-    'fact_news_companies',
-    'fact_news_topics',
-    'fact_candles'
-]
+ENDPOINTS = (
+    "dim_time",
+    "dim_news",
+    "dim_topics",
+    "dim_companies",
+    "fact_news_companies",
+    "fact_news_topics",
+    "fact_candles",
+)
+BASE_URL = os.getenv("API_BASE_URL", "http://localhost:5000").rstrip("/")
+OUTPUT_PATH = Path(os.getenv("EXCEL_OUTPUT_PATH", "exported_data.xlsx"))
+PAGE_SIZE = 5000
 
-# Tên file Excel xuất ra
-excel_filename = 'exported_data.xlsx'
 
-# Dictionary lưu trữ DataFrame cho mỗi sheet
-sheet_data = {}
-page_size = 5000
+def fetch_table(session: requests.Session, table: str) -> pd.DataFrame:
+    rows = []
+    offset = 0
+    while True:
+        response = session.get(
+            f"{BASE_URL}/{table}",
+            params={"limit": PAGE_SIZE, "offset": offset},
+            timeout=30,
+        )
+        response.raise_for_status()
+        page = response.json()
+        rows.extend(page)
+        if len(page) < PAGE_SIZE:
+            return pd.DataFrame(rows)
+        offset += PAGE_SIZE
 
-# Lặp qua từng endpoint và gọi API
-for endpoint in endpoints:
-    print(f"Fetching data from /{endpoint} ...")
-    try:
-        rows = []
-        offset = 0
-        while True:
-            response = requests.get(
-                f"{BASE_URL}/{endpoint}",
-                params={"limit": page_size, "offset": offset},
-                timeout=30,
-            )
-            response.raise_for_status()
-            page = response.json()
-            rows.extend(page)
-            if len(page) < page_size:
-                break
-            offset += page_size
 
-        df = pd.DataFrame(rows)
+def export_to_excel(output_path: Path = OUTPUT_PATH) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with requests.Session() as session, pd.ExcelWriter(
+        output_path, engine="openpyxl"
+    ) as writer:
+        for table in ENDPOINTS:
+            frame = fetch_table(session, table)
+            frame.to_excel(writer, sheet_name=table, index=False)
+            print(f"Exported {len(frame)} rows from {table}")
+    print(f"Wrote dashboard extract to {output_path.resolve()}")
 
-        # Lưu vào dict
-        sheet_data[endpoint] = df
-    except Exception as e:
-        print(f"Lỗi khi fetch {endpoint}: {e}")
 
-# Ghi tất cả các sheet vào file Excel
-with pd.ExcelWriter(excel_filename, engine='openpyxl') as writer:
-    for sheet_name, df in sheet_data.items():
-        df.to_excel(writer, sheet_name=sheet_name, index=False)
-
-print(f"\n✅ Dữ liệu đã được lưu vào file: {excel_filename}")
+if __name__ == "__main__":
+    export_to_excel()
