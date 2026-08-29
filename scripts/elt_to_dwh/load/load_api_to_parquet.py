@@ -2,6 +2,20 @@ import os
 import json
 import polars as pl
 
+
+OHLC_SCHEMA = {
+    "ticker": pl.String,
+    "volume": pl.Int64,
+    "volume_weighted": pl.Float64,
+    "open": pl.Float64,
+    "close": pl.Float64,
+    "high": pl.Float64,
+    "low": pl.Float64,
+    "time_stamp": pl.Int64,
+    "num_of_trades": pl.Int64,
+    "is_otc": pl.Boolean,
+}
+
 def get_file_by_date(directory, execution_date, prefix, extension=".json"):
     """
     Get the file path by matching with the execution date and prefix.
@@ -23,19 +37,28 @@ def convert_ohlcs_to_parquet(**kwargs):
 
     latest_file = get_file_by_date(input_directory, execution_date, "crawl_ohlcs")
     if latest_file:
-        df = pl.read_json(latest_file)
-        df = df.rename({
-            "T": "ticker",
-            "v": "volume",
-            "vw": "volume_weighted",
-            "o": "open",
-            "c": "close",
-            "h": "high",
-            "l": "low",
-            "t": "time_stamp",
-            "n": "num_of_trades",
-            "otc": "is_otc"
-        })
+        with open(latest_file, "r", encoding="utf-8") as stream:
+            rows = json.load(stream)
+        if not rows:
+            # Empty OHLC is expected on weekends and market holidays.
+            df = pl.DataFrame(schema=OHLC_SCHEMA)
+        else:
+            df = pl.DataFrame(rows)
+            df = df.rename({
+                "T": "ticker",
+                "v": "volume",
+                "vw": "volume_weighted",
+                "o": "open",
+                "c": "close",
+                "h": "high",
+                "l": "low",
+                "t": "time_stamp",
+                "n": "num_of_trades",
+                "otc": "is_otc"
+            })
+            if "is_otc" not in df.columns:
+                df = df.with_columns(pl.lit(False).alias("is_otc"))
+            df = df.select(list(OHLC_SCHEMA)).cast(OHLC_SCHEMA)
 
         filename = os.path.basename(latest_file).replace('.json', ".parquet")
         output_filepath = os.path.join(output_directory, filename)
@@ -43,7 +66,7 @@ def convert_ohlcs_to_parquet(**kwargs):
         df.write_parquet(output_filepath)
         print(f"[ohlcs] Saved Parquet file: {output_filepath}")
     else:
-        print("[ohlcs] No JSON files found.")
+        raise FileNotFoundError(f"[ohlcs] Input file not found for {execution_date}")
 
 def convert_news_to_parquet(**kwargs):
     input_directory = kwargs.get('input_directory', '/opt/airflow/data/raw/news')
@@ -58,6 +81,6 @@ def convert_news_to_parquet(**kwargs):
         df.write_parquet(output_filepath)
         print(f"[news] Saved Parquet file: {output_filepath}")
     else:
-        print("[news] No JSON files found.")
+        raise FileNotFoundError(f"[news] Input file not found for {execution_date}")
 
 
