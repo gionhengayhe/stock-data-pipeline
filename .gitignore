@@ -8,8 +8,6 @@ logs/
 tmp/
 
 # Generated pipeline artifacts. Keep small fixtures under tests/fixtures instead.
-data/raw/
-data/processed/
-data/parquet/
+data/
 database/config_dwh/*.duckdb
 flask-api/*.xlsx
