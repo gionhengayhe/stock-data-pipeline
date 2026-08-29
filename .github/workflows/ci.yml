@@ -13,6 +13,10 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
       - run: pip install -r requirements-dev.txt
       - run: python -m compileall -q scripts airflow flask-api
       - run: pytest -q
