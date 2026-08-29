@@ -1,4 +1,4 @@
-from python:3.12-slim
+FROM python:3.12-slim
 
 WORKDIR ./
 
@@ -9,4 +9,7 @@ COPY app.py .
 
 EXPOSE 5000
 
-CMD python app.py
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=3)"
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "4", "app:app"]

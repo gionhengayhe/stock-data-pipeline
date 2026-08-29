@@ -21,17 +21,28 @@ excel_filename = 'exported_data.xlsx'
 
 # Dictionary lưu trữ DataFrame cho mỗi sheet
 sheet_data = {}
+page_size = 5000
 
 # Lặp qua từng endpoint và gọi API
 for endpoint in endpoints:
     print(f"Fetching data from /{endpoint} ...")
     try:
-        response = requests.get(f"{BASE_URL}/{endpoint}")
-        response.raise_for_status()
-        data = response.json()
+        rows = []
+        offset = 0
+        while True:
+            response = requests.get(
+                f"{BASE_URL}/{endpoint}",
+                params={"limit": page_size, "offset": offset},
+                timeout=30,
+            )
+            response.raise_for_status()
+            page = response.json()
+            rows.extend(page)
+            if len(page) < page_size:
+                break
+            offset += page_size
 
-        # Convert to DataFrame
-        df = pd.DataFrame(data)
+        df = pd.DataFrame(rows)
 
         # Lưu vào dict
         sheet_data[endpoint] = df
