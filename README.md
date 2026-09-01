@@ -1,92 +1,104 @@
-# 📊 Financial Market Data Engineering Pipeline
+# Stock Data Pipeline
 
-## 🔍 Overview
+Containerized batch data pipeline that collects U.S. stock-market and financial
+news data, processes it with Apache Spark, loads it into a dimensional DuckDB
+warehouse, and serves it to a Tableau dashboard.
 
-A production-grade batch ETL pipeline for financial data, integrating APIs, automated processing, and dashboarding—all containerized for portability and scalability.
+## What It Does
 
-## 🎯 Problem Statement
-
-Financial data is fragmented across APIs, hard to query at scale, and often costly to clean and structure. This leads to inefficiency for analysts and decision-makers.
-
-This project addresses the problem by:
-
-- Consolidating data from **three separate APIs** (stock prices, news sentiment, company metadata)
-- Processing over **100,000+ records**
-- Automating foreign key mapping and schema normalization
-- Reducing manual data preparation time by over **85%**
-- Powering manually refreshed **Tableau** dashboards for data storytelling
-
----
-
-## ⚙️ Architecture
-
-- **Orchestration:** Apache Airflow
-- **Database Backend:** PostgreSQL
-- **Data Lake:** Amazon S3
-- **Data Warehouse:** DuckDB
-- **Processing Engine:** PySpark (containerized)
-- **Visualization:** Tableau
-- **CI/CD**: Docker
-
----
-
-## 📡 Data Sources
-
-| Source API                                   | Description                                                                                                                     |
-| -------------------------------------------- |---------------------------------------------------------------------------------------------------------------------------------|
-| [sec-api.io](https://sec-api.io)             | Provides the list of companies currently listed on major U.S. stock exchanges (NYSE, NASDAQ).                                   |
-| [Alpha Vantage](https://www.alphavantage.co) | Offers two APIs: one for global market status, and another for financial news with sentiment scores from top-tier news sources. |
-| [Polygon.io](https://polygon.io)             | Daily OHLCV per company                                                                                                         |
-
----
-
-## 🧱 Data Warehouse Design
-
-The warehouse uses a **Galaxy Schema**, with multiple fact tables sharing conformed dimensions:
-
-### Fact Tables
-
-- `fact_news_companies`: Links news articles to companies.
-- `fact_news_topics`: Links news articles to topics.
-- `fact_candles`: OHLCV market prices per company per day.
-
-### Dimension Tables
-
-- `dim_news`: News metadata + sentiment scores.
-- `dim_companies`: Company name, ticker, and stock exchange status.
-- `dim_topics`: Extracted topics using NLP.
-- `dim_time`: Daily calendar dimension (one row per date).
-
----
-
-## 📁 Project Structure
-
-```bash
-.
-├── airflow/                # Airflow DAGs and configs
-├── data/                   # Data files
-├── database/
-│   ├── config_dwh/         # DDL for DuckDB schema
-│   └── config_db/          # DDL for PostgreSQL schema
-├── scripts/                # Python + PySpark script
-├── notebooks/              # Jupyter notebooks for analysis
-├── flask-api/              # Flask API for serving data
-├── README.md
-├── docker-compose.yml      # Docker Compose for local dev
+```text
+SEC API / Alpha Vantage / Polygon.io
+                ↓
+        Airflow orchestration
+                ↓
+      Parquet → Amazon S3
+                ↓
+       Apache Spark transforms
+                ↓
+       DuckDB + quality gate
+                ↓
+      Flask API → Excel → Tableau
 ```
 
-## 🚀 Getting Started
+The project contains two Airflow workflows:
 
-```bash
-git clone https://github.com/gionhengayhe/stock-data-pipeline.git
-cd stock-data-pipeline
-docker-compose up --build
+- `etl_to_db`: refreshes company and market metadata in PostgreSQL monthly.
+- `elt_to_dwh`: collects daily OHLCV and news data, runs Spark transformations,
+  loads DuckDB, and validates the warehouse.
+
+## Results
+
+- Dimensional warehouse with four dimensions and three fact tables.
+- Automated schema, freshness, volume, coverage, uniqueness, and foreign-key
+  checks.
+- Snapshot-consistent export of raw dimension/fact tables to
+  `flask-api/exported_data/stock_data.xlsx`.
+- Tableau workbook using relationships and calculated fields directly on the
+  dimensional model.
+- Reproducible findings notebook and automated pipeline tests.
+
+Current analytical findings include:
+
+- On the latest observed market session, **27.1% of securities advanced** and
+  median open-to-close return was **-0.43%**.
+- Technology generated **39.1% of estimated trading value** from **11.3% of
+  observed securities**.
+- Same-day ticker sentiment and return had only **0.069 correlation**, so news
+  sentiment is treated as context rather than a trading signal.
+
+## Tech Stack
+
+`Python` · `Polars` · `PostgreSQL` · `Amazon S3` · `Apache Spark` · `DuckDB` ·
+`Apache Airflow` · `Flask` · `Docker` · `Tableau`
+
+## Project Structure
+
+```text
+airflow/        Airflow DAGs and image configuration
+database/       PostgreSQL and DuckDB schemas
+scripts/        Extraction, staging, Spark transformation, and quality checks
+flask-api/      Read-only API and Excel exporter
+dashboard/      Tableau workbook
+notebooks/      Reproducible findings analysis
+tests/          Pipeline and data-contract tests
 ```
-Access Airflow UI at: http://localhost:8080
 
-Access Flask API at: http://localhost:5000
-## 📎 Deliverables
+## How to Run
 
-- 📘 Project Documentation: [View Detailed Documentation](https://drive.google.com/file/d/12CdgVoBiFTVqCraiy8LkM63DVi-YIiqu/view?usp=drive_link)
+### 1. Configure credentials
 
-- 📊 Interactive Tableau Dashboard: [View Dashboard](https://drive.google.com/file/d/1SqiWW-mO0_QiTjexGpnsXwUH5cBxHKYc/view?usp=drive_link)
+```powershell
+Copy-Item .env.example .env
+```
+
+Add the required SEC API, Alpha Vantage, Polygon.io, AWS, and S3 credentials to
+`.env`.
+
+### 2. Start the pipeline
+
+```powershell
+docker compose up -d --build
+```
+
+Open Airflow at <http://localhost:8080>. Run `etl_to_db` once before triggering
+`elt_to_dwh` so the company metadata snapshot is available.
+
+### 3. Export data for Tableau
+
+```powershell
+uv venv --python 3.12 .venv
+uv pip install --python .venv\Scripts\python.exe -r requirements-dev.txt
+.\.venv\Scripts\python.exe flask-api\dump_api_to_excel.py
+```
+
+Open [`dashboard/dashboard.twb`](dashboard/dashboard.twb) and refresh its Excel
+data source.
+
+## Tests
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+This is a portfolio learning project, not a live trading system or investment
+recommendation.
