@@ -7,9 +7,12 @@ from airflow.utils.trigger_rule import TriggerRule
 from scripts.elt_to_dwh.create_dwh import create_dwh
 from scripts.elt_to_dwh.extract.crawl_news import crawl_news
 from scripts.elt_to_dwh.extract.crawl_ohlcs import crawl_ohlcs
-from scripts.elt_to_dwh.load.load_api_to_parquet import convert_news_to_parquet, convert_ohlcs_to_parquet
-from scripts.elt_to_dwh.load.load_db_to_parquet import load_db_to_parquet
-from scripts.elt_to_dwh.load.load_parquet_to_datalake import upload_daily_artifacts
+from scripts.elt_to_dwh.stage import (
+    convert_news_to_parquet,
+    convert_ohlcs_to_parquet,
+    extract_companies_to_parquet,
+    upload_daily_artifacts,
+)
 from scripts.quality.validate_dwh import validate_dwh
 
 
@@ -73,9 +76,9 @@ with DAG(
             task_id='convert_ohlcs_to_parquet',
             python_callable=convert_ohlcs_to_parquet
         )
-        load_db_to_parquet_task = PythonOperator(
-            task_id='load_db_to_parquet',
-            python_callable=load_db_to_parquet
+        extract_companies_task = PythonOperator(
+            task_id='extract_companies_to_parquet',
+            python_callable=extract_companies_to_parquet
         )
         crawl_news_task >> convert_news_to_parquet_task
         crawl_ohlcs_task >> convert_ohlcs_to_parquet_task
@@ -96,6 +99,7 @@ with DAG(
     validate_dwh_task = PythonOperator(
         task_id='validate_dwh',
         python_callable=validate_dwh,
+        op_kwargs={"expected_date": "{{ ds }}"},
     )
 
     create_dwh_task >> extract_group >> load_to_datalake_task >> transform_group
