@@ -66,7 +66,9 @@ services:
       AIRFLOW_ADMIN_FIRSTNAME: ${AIRFLOW_ADMIN_FIRSTNAME:-Data}
       AIRFLOW_ADMIN_LASTNAME: ${AIRFLOW_ADMIN_LASTNAME:-Engineer}
       AIRFLOW_ADMIN_EMAIL: ${AIRFLOW_ADMIN_EMAIL:-admin@example.com}
-      AIRFLOW_CONN_SPARK_CONN: spark://spark-master:7077
+      # Airflow's Spark provider expects the connection host itself to include
+      # the spark:// prefix. Percent-encode it so URI parsing preserves it.
+      AIRFLOW_CONN_SPARK_CONN: spark://spark%3A%2F%2Fspark-master:7077
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@database:5432/${AIRFLOW_DB:-airflow}
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       PYTHONDONTWRITEBYTECODE: "1"
