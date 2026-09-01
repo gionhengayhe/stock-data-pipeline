@@ -1,11 +1,11 @@
 .git
 .idea
-.venv
+.venv*
 __pycache__
 *.pyc
 data
-database/config_dwh/*.duckdb
-flask-api/*.xlsx
+database/config_dwh/*.duckdb*
+flask-api/exported_data
 logs
 notebooks
 tmp

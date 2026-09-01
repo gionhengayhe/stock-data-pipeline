@@ -1,13 +1,14 @@
 .env
-.venv
+.venv*/
 __pycache__/
 *.py[cod]
 .idea/
 .pytest_cache/
+.ipynb_checkpoints/
 logs/
 tmp/
 
 # Generated pipeline artifacts. Keep small fixtures under tests/fixtures instead.
 data/
-database/config_dwh/*.duckdb
-flask-api/*.xlsx
+database/config_dwh/*.duckdb*
+/flask-api/exported_data/
