@@ -8,6 +8,7 @@ def crawl_markets(**kwargs):
         'https://www.alphavantage.co/query',
         params={"function": "MARKET_STATUS", "apikey": api_key},
         required_key="markets",
+        force_ipv6=True,
     )
     data = response["markets"]
 

@@ -51,6 +51,7 @@ def _fetch_news_range(start: datetime, end: datetime, api_key: str) -> list[dict
                 "apikey": api_key,
             },
             required_key="feed",
+            force_ipv6=True,
         )
         request_count += 1
         feed = payload["feed"]

@@ -32,9 +32,10 @@ def test_fetch_news_uses_latest_timestamp_cursor_and_deduplicates(monkeypatch):
     ]
     requested_params = []
 
-    def fake_get_json(_url, *, params, required_key):
+    def fake_get_json(_url, *, params, required_key, force_ipv6):
         requested_params.append(params)
         assert required_key == "feed"
+        assert force_ipv6 is True
         return {"feed": pages[len(requested_params) - 1]}
 
     monkeypatch.setattr(crawl_news, "API_LIMIT", 3)
@@ -57,7 +58,8 @@ def test_fetch_news_uses_latest_timestamp_cursor_and_deduplicates(monkeypatch):
 
 
 def test_fetch_news_fails_when_a_full_page_cannot_advance(monkeypatch):
-    def fake_get_json(_url, *, params, required_key):
+    def fake_get_json(_url, *, params, required_key, force_ipv6):
+        assert force_ipv6 is True
         return {
             "feed": [
                 _article("a", "20260801T235959"),
