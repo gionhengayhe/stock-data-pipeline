@@ -48,7 +48,7 @@ def spark_job(
 
 with DAG(
     dag_id='elt_to_dwh',
-    start_date=datetime(2025, 7, 10),
+    start_date=datetime(2026, 8, 1),
     schedule='@daily',
     catchup=False,
     max_active_runs=1,
@@ -62,7 +62,8 @@ with DAG(
     with TaskGroup('extract_task') as extract_group:
         crawl_news_task = PythonOperator(
             task_id='crawl_news',
-            python_callable=crawl_news
+            python_callable=crawl_news,
+            retries = 0
         )
         crawl_ohlcs_task = PythonOperator(
             task_id='crawl_ohlcs',
